@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Evaluasi Penyelenggaraan Pelatihan</title>
+    <!--
+        =====================================================================
+        PETUNJUK EMBED (Blogger / Google Sites):
+        1. Deploy Code.gs sebagai Web App: Deploy > New deployment > Web app
+           - Execute as: Me
+           - Who has access: Anyone
+        2. Salin URL Web App ke variabel GAS_URL di dalam blok kode script.
+        3. Google Sites: Insert > Embed > Embed code, tempel seluruh kode HTML ini.
+        4. Blogger: buat entri baru, mode HTML view, tempel seluruh kode ini.
+        5. Jika HTML dijalankan sebagai file index.html di project Apps Script
+           yang sama, mode google.script.run otomatis aktif (tanpa perlu GAS_URL).
+        =====================================================================
+    -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <style>
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        .bg-blogger-hide { display: none !important; }
+        #navbar-iframe, #header, #footer, .sidebar, .post-title, .post-footer, .comments, .date-header, .blog-pager { display: none !important; }
+        .post-body { margin: 0 !important; padding: 0 !important; }
+        #app-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; overflow-y: auto; background-color: #f3f4f6; z-index: 999999; }
+        .glass-effect { background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); }
+        .spinner { border: 4px solid rgba(0, 0, 0, 0.1); width: 40px; height: 40px; border-radius: 50%; border-left-color: #2563eb; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .blogger-thumbnail { width: 1px; height: 1px; opacity: 0; position: absolute; pointer-events: none; }
+    </style>
+</head>
+<body>
+    <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=800&auto=format&fit=crop" class="blogger-thumbnail" alt="Thumbnail Evaluasi">
+    <div id="app-container">
+
+        <!-- GLOBAL LOADER -->
+        <div id="loader" class="fixed inset-0 bg-slate-900 bg-opacity-60 flex flex-col items-center justify-center z-[100000] hidden backdrop-blur-sm">
+            <div class="bg-white p-6 rounded-2xl shadow-2xl flex flex-col items-center">
+                <div class="spinner mb-4"></div>
+                <p class="text-gray-700 font-semibold text-sm" id="loader-text">Memproses data...</p>
+            </div>
+        </div>
+
+        <!-- NOTIFICATION TOAST -->
+        <div id="toast" onclick="hideToast()" class="fixed bottom-5 right-5 z-[100001] transform transition-all duration-300 translate-x-full flex items-center p-4 rounded-xl shadow-2xl text-white font-medium max-w-md cursor-pointer select-none hover:opacity-95">
+            <span id="toast-icon" class="mr-3 text-2xl"></span>
+            <span id="toast-message" class="text-sm pr-4">Notifikasi</span>
+            <button type="button" onclick="event.stopPropagation(); hideToast();" class="ml-auto text-white/80 hover:text-white text-base focus:outline-none">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- VIEW: LOGIN -->
+        <div id="view-login" class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-900 via-indigo-900 to-slate-900">
+            <div class="glass-effect rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+                <div class="p-8">
+                    <div class="text-center mb-8">
+                        <div class="inline-flex p-4 rounded-2xl bg-blue-50 text-blue-600 mb-3 shadow-inner">
+                            <i class="fa-solid fa-clipboard-check text-4xl"></i>
+                        </div>
+                        <h1 class="text-2xl font-bold text-gray-800">Evaluasi Pelatihan</h1>
+                        <p class="text-xs text-gray-500 mt-1">Pusdiklat Manajemen dan Kepemimpinan</p>
+                    </div>
+
+                    <div class="flex border-b border-gray-200 mb-6">
+                        <button onclick="switchLoginTab('peserta')" id="tab-peserta" class="w-1/2 py-2.5 text-center font-semibold text-blue-600 border-b-2 border-blue-600 transition-all">Peserta</button>
+                        <button onclick="switchLoginTab('admin')" id="tab-admin" class="w-1/2 py-2.5 text-center font-medium text-gray-400 border-b-2 border-transparent hover:text-gray-600 transition-all">Admin</button>
+                    </div>
+
+                    <form id="form-login-peserta" onsubmit="handleLogin(event, 'peserta')">
+                        <div class="mb-6">
+                            <label class="block text-gray-700 text-xs font-bold uppercase tracking-wider mb-2" for="nip">NIP (Nomor Induk Pegawai)</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><i class="fa-solid fa-id-card"></i></span>
+                                <input type="text" id="nip" class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" placeholder="Masukkan NIP Anda..." required>
+                            </div>
+                            <p class="text-[11px] text-gray-500 mt-2"><i class="fa-solid fa-circle-info mr-1"></i>Sistem akan mencocokkan kuesioner & pengajar sesuai jenis pelatihan yang Anda ikuti.</p>
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-lg shadow-blue-500/30 flex items-center justify-center gap-2">
+                            <span>Masuk Kuesioner</span>
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </button>
+                    </form>
+
+                    <form id="form-login-admin" onsubmit="handleLogin(event, 'admin')" class="hidden">
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-xs font-bold uppercase tracking-wider mb-2" for="username">Username Admin</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><i class="fa-solid fa-user"></i></span>
+                                <input type="text" id="username" class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" placeholder="Username Admin" required>
+                            </div>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-gray-700 text-xs font-bold uppercase tracking-wider mb-2" for="password">Password</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><i class="fa-solid fa-lock"></i></span>
+                                <input type="password" id="password" class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" placeholder="••••••••" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2">
+                            <span>Login Panel Admin</span>
+                            <i class="fa-solid fa-shield-halved text-xs"></i>
+                        </button>
+                    </form>
+
+                    <div id="preview-notice" class="mt-6 p-3 bg-amber-50 text-amber-800 text-xs rounded-xl border border-amber-200 hidden">
+                        <div class="font-bold flex items-center gap-1.5 mb-1 text-amber-900">
+                            <i class="fa-solid fa-vial"></i> MODE PREVIEW AKTIF
+                        </div>
+                        Peserta Dummy (Pelatihan PKA): <code class="bg-amber-100 px-1 py-0.5 rounded font-mono">123456789</code><br>
+                        Peserta Dummy (Pelatihan PKP): <code class="bg-amber-100 px-1 py-0.5 rounded font-mono">987654321</code><br>
+                        Admin Dummy: <code class="bg-amber-100 px-1 py-0.5 rounded font-mono">admin</code> / <code class="bg-amber-100 px-1 py-0.5 rounded font-mono">yeswecan</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: DASHBOARD PESERTA -->
+        <div id="view-peserta" class="hidden flex h-screen bg-gray-100 overflow-hidden">
+            <aside class="w-64 bg-white shadow-xl h-full flex flex-col hidden md:flex z-10">
+                <div class="p-6 border-b">
+                    <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                        <i class="fa-solid fa-graduation-cap text-blue-600 text-xl"></i> E-Evaluasi
+                    </h2>
+                    <p class="text-xs text-gray-500 mt-1 truncate" id="peserta-name-display">Nama Peserta</p>
+                    <p class="text-[11px] text-blue-600 font-semibold mt-0.5" id="peserta-pelatihan-display"></p>
+                </div>
+                <nav class="flex-1 overflow-y-auto py-4">
+                    <div class="px-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Menu Utama</div>
+                    <a href="#" onclick="loadPesertaMenu('beranda')" id="menu-p-beranda" class="flex items-center gap-3 px-6 py-3 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 transition-all"><i class="fa-solid fa-house w-5"></i> Beranda</a>
+                    <div class="px-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 mt-4">Kuesioner</div>
+                    <a href="#" onclick="loadPesertaMenu('Widyaiswara')" id="menu-p-Widyaiswara" class="flex items-center gap-3 px-6 py-3 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 transition-all"><i class="fa-solid fa-chalkboard-user w-5"></i> Widyaiswara</a>
+                    <a href="#" onclick="loadPesertaMenu('Coach')" id="menu-p-Coach" class="flex items-center gap-3 px-6 py-3 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 transition-all"><i class="fa-solid fa-user-tie w-5"></i> Coach</a>
+                    <a href="#" onclick="loadPesertaMenu('Mentor')" id="menu-p-Mentor" class="flex items-center gap-3 px-6 py-3 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 transition-all"><i class="fa-solid fa-user-graduate w-5"></i> Mentor</a>
+                    <a href="#" onclick="loadPesertaMenu('Penguji')" id="menu-p-Penguji" class="flex items-center gap-3 px-6 py-3 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 transition-all"><i class="fa-solid fa-clipboard-user w-5"></i> Penguji</a>
+                    <a href="#" onclick="loadPesertaMenu('Penyelenggara')" id="menu-p-Penyelenggara" class="flex items-center gap-3 px-6 py-3 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 transition-all"><i class="fa-solid fa-building w-5"></i> Penyelenggara</a>
+                    <a href="#" onclick="loadPesertaMenu('Sarpras')" id="menu-p-Sarpras" class="flex items-center gap-3 px-6 py-3 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 transition-all"><i class="fa-solid fa-building-columns w-5"></i> Sarpras</a>
+                    <a href="#" onclick="loadPesertaMenu('LMS')" id="menu-p-LMS" class="flex items-center gap-3 px-6 py-3 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 transition-all"><i class="fa-solid fa-laptop-code w-5"></i> LMS / E-Learning</a>
+                </nav>
+                <div class="p-4 border-t">
+                    <button onclick="logout()" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition-all font-semibold">
+                        <i class="fa-solid fa-right-from-bracket"></i> Keluar
+                    </button>
+                </div>
+            </aside>
+
+            <main class="flex-1 flex flex-col h-full overflow-hidden">
+                <header class="bg-white shadow-sm p-4 flex justify-between items-center md:hidden border-b">
+                    <h2 class="text-base font-bold text-gray-800">E-Evaluasi Peserta</h2>
+                    <button onclick="logout()" class="text-red-600 p-2"><i class="fa-solid fa-right-from-bracket text-lg"></i></button>
+                </header>
+                <div class="flex-1 overflow-y-auto p-4 md:p-8" id="peserta-content"></div>
+            </main>
+        </div>
+
+        <!-- VIEW: DASHBOARD ADMIN -->
+        <div id="view-admin" class="hidden flex h-screen bg-gray-100 overflow-hidden">
+            <aside class="w-64 bg-slate-900 text-white shadow-2xl h-full flex flex-col hidden md:flex z-10">
+                <div class="p-6 border-b border-slate-800">
+                    <h2 class="text-lg font-bold flex items-center gap-2 text-white">
+                        <i class="fa-solid fa-shield-halved text-blue-400"></i> Admin Panel
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-1">Sistem Evaluasi Pelatihan</p>
+                </div>
+                <nav class="flex-1 overflow-y-auto py-4">
+                    <div class="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Utama</div>
+                    <a href="#" onclick="loadAdminMenu('dashboard')" id="menu-a-dashboard" class="flex items-center gap-3 px-6 py-3 text-sm text-slate-300 hover:bg-slate-800 transition-all border-l-4 border-transparent"><i class="fa-solid fa-chart-pie w-5"></i> Dashboard</a>
+                    <div class="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 mt-4">Kelola Data</div>
+                    <a href="#" onclick="loadAdminMenu('master_pegawai')" id="menu-a-master_pegawai" class="flex items-center gap-3 px-6 py-3 text-sm text-slate-300 hover:bg-slate-800 transition-all border-l-4 border-transparent"><i class="fa-solid fa-id-card w-5"></i> Master Pegawai</a>
+                    <a href="#" onclick="loadAdminMenu('pelatihan')" id="menu-a-pelatihan" class="flex items-center gap-3 px-6 py-3 text-sm text-slate-300 hover:bg-slate-800 transition-all border-l-4 border-transparent"><i class="fa-solid fa-calendar-days w-5"></i> Pelatihan</a>
+                    <a href="#" onclick="loadAdminMenu('peserta')" id="menu-a-peserta" class="flex items-center gap-3 px-6 py-3 text-sm text-slate-300 hover:bg-slate-800 transition-all border-l-4 border-transparent"><i class="fa-solid fa-users w-5"></i> Peserta</a>
+                    <div class="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 mt-4">Pengajar / SDM</div>
+                    <a href="#" onclick="loadAdminMenu('widyaiswara')" id="menu-a-widyaiswara" class="flex items-center gap-3 px-6 py-3 text-sm text-slate-300 hover:bg-slate-800 transition-all border-l-4 border-transparent"><i class="fa-solid fa-chalkboard-user w-5"></i> Widyaiswara</a>
+                    <a href="#" onclick="loadAdminMenu('coach')" id="menu-a-coach" class="flex items-center gap-3 px-6 py-3 text-sm text-slate-300 hover:bg-slate-800 transition-all border-l-4 border-transparent"><i class="fa-solid fa-user-tie w-5"></i> Coach</a>
+                    <a href="#" onclick="loadAdminMenu('mentor')" id="menu-a-mentor" class="flex items-center gap-3 px-6 py-3 text-sm text-slate-300 hover:bg-slate-800 transition-all border-l-4 border-transparent"><i class="fa-solid fa-user-graduate w-5"></i> Mentor</a>
+                    <a href="#" onclick="loadAdminMenu('penguji')" id="menu-a-penguji" class="flex items-center gap-3 px-6 py-3 text-sm text-slate-300 hover:bg-slate-800 transition-all border-l-4 border-transparent"><i class="fa-solid fa-clipboard-user w-5"></i> Penguji</a>
+                    <a href="#" onclick="loadAdminMenu('kuesioner')" id="menu-a-kuesioner" class="flex items-center gap-3 px-6 py-3 text-sm text-slate-300 hover:bg-slate-800 transition-all border-l-4 border-transparent"><i class="fa-solid fa-list-check w-5"></i> Kuesioner</a>
+                    <div class="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 mt-4">Laporan</div>
+                    <a href="#" onclick="loadAdminMenu('hasil')" id="menu-a-hasil" class="flex items-center gap-3 px-6 py-3 text-sm text-slate-300 hover:bg-slate-800 transition-all border-l-4 border-transparent"><i class="fa-solid fa-square-poll-vertical w-5"></i> Hasil Evaluasi</a>
+                </nav>
+                <div class="p-4 border-t border-slate-800">
+                    <button onclick="logout()" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm text-red-400 bg-slate-800 hover:bg-slate-700 rounded-xl transition-all font-semibold">
+                        <i class="fa-solid fa-right-from-bracket"></i> Keluar
+                    </button>
+                </div>
+            </aside>
+
+            <main class="flex-1 flex flex-col h-full overflow-hidden">
+                <header class="bg-white shadow-sm p-4 flex justify-between items-center md:hidden border-b">
+                    <h2 class="text-base font-bold text-slate-800">Admin Panel</h2>
+                    <button onclick="logout()" class="text-red-600 p-2"><i class="fa-solid fa-right-from-bracket text-lg"></i></button>
+                </header>
+                <div class="flex-1 overflow-y-auto p-4 md:p-8 bg-slate-50" id="admin-content"></div>
+            </main>
+        </div>
+
+        <!-- MODAL CRUD ADMIN -->
+        <div id="crud-modal" class="fixed inset-0 bg-slate-900 bg-opacity-50 z-[50000] hidden flex items-center justify-center p-4 backdrop-blur-sm">
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
+                <div class="px-6 py-4 border-b flex justify-between items-center bg-gray-50">
+                    <h3 class="text-base font-bold text-gray-800" id="modal-title">Form Data</h3>
+                    <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+                </div>
+                <div class="p-6 overflow-y-auto flex-1" id="modal-body"></div>
+                <div class="px-6 py-4 border-t bg-gray-50 flex justify-end gap-3">
+                    <button onclick="closeModal()" class="px-4 py-2 text-sm text-gray-600 bg-white border border-gray-300 rounded-xl hover:bg-gray-50">Batal</button>
+                    <button id="modal-save-btn" class="px-5 py-2 text-sm text-white bg-blue-600 rounded-xl hover:bg-blue-700 shadow-md font-semibold">Simpan Data</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN JAVASCRIPT LOGIC -->
+    <script>
+        const IS_PREVIEW = false; // Ubah ke true untuk mode preview (data dummy)
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbyjhK8JEoNi4cFy8pyfdhKyyFNATtXNIoOOwBtqYkhsuT1EdmcSIubjzjMJQj2JeoX0Uw/exec"; // Isi dengan URL Web App hasil deploy (untuk embed Blogger/Google Sites)
+
+        let currentUser = null;
+        let activeAdminMenu = 'dashboard';
+        let activePesertaMenu = 'beranda';
+        let currentAdminData = null;
+        let currentPesertaFormData = null;
+        let toastTimeout = null;
+
+        // Data Dummy Preview Mode (v2.2 - pengajar terikat jenis pelatihan)
+        let dbDummy = {
+            users: [
+                { nip: '123456789', nama: 'Budi Santoso', password: '', role: 'peserta', id_pelatihan: 'P1' },
+                { nip: '987654321', nama: 'Siti Aminah', password: '', role: 'peserta', id_pelatihan: 'P2' },
+                { nip: 'admin', nama: 'Administrator Utama', password: 'yeswecan', role: 'admin', id_pelatihan: '' }
+            ],
+            pelatihan: [
+                { id: 'P1', nama: 'Pelatihan Kepemimpinan Administrator (PKA)', tgl_mulai: '2026-10-01', tgl_selesai: '2026-12-01' },
+                { id: 'P2', nama: 'Pelatihan Kepemimpinan Pengawas (PKP)', tgl_mulai: '2026-11-01', tgl_selesai: '2026-12-15' }
+            ],
+            peserta_pelatihan: [
+                { nip: '123456789', id_pelatihan: 'P1' },
+                { nip: '987654321', id_pelatihan: 'P2' }
+            ],
+            pengajar: [
+                { id: 'T1', nama: 'Dr. Ahmad Subarjo, M.Si', peran: 'Widyaiswara', id_pelatihan: 'P1' },
+                { id: 'T2', nama: 'Siti Aminah, S.E., M.M.', peran: 'Coach', id_pelatihan: 'P1' },
+                { id: 'T3', nama: 'Bambang Pamungkas', peran: 'Penguji', id_pelatihan: 'P2' },
+                { id: 'T4', nama: 'Indra Hermawan', peran: 'Mentor', id_pelatihan: 'SEMUA' }
+            ],
+            master_pegawai: [
+                { id: '198001012005011001', nama: 'Dr. Ahmad Subarjo, M.Si', jabatan: 'Widyaiswara Ahli Madya' },
+                { id: '198205052010012002', nama: 'Siti Aminah, S.E., M.M.', jabatan: 'Coach PKP' },
+                { id: '198503032012031003', nama: 'Bambang Pamungkas', jabatan: 'Penguji' },
+                { id: '198807072015011004', nama: 'Indra Hermawan', jabatan: 'Mentor' }
+            ],
+            kuesioner: [
+                { id: 'Q1', id_pelatihan: 'P1', kategori: 'Widyaiswara', tipe: 'likert', pertanyaan: '[PKA] Materi disampaikan dengan jelas dan sistematis.' },
+                { id: 'Q2', id_pelatihan: 'P1', kategori: 'Widyaiswara', tipe: '100', pertanyaan: '[PKA] Berapa nilai penguasaan materi pengajar ini? (0-100)' },
+                { id: 'Q3', id_pelatihan: 'P1', kategori: 'Penyelenggara', tipe: 'likert', pertanyaan: '[PKA] Panitia responsif terhadap kebutuhan peserta PKA.' },
+                { id: 'Q4', id_pelatihan: 'P2', kategori: 'Widyaiswara', tipe: 'likert', pertanyaan: '[PKP] Widyaiswara memfasilitasi diskusi studi kasus dengan baik.' },
+                { id: 'Q5', id_pelatihan: 'P2', kategori: 'Sarpras', tipe: 'likert', pertanyaan: '[PKP] Ruang kelas dan sarana pembelajaran PKP sangat memadai.' },
+                { id: 'Q6', id_pelatihan: 'SEMUA', kategori: 'LMS', tipe: 'likert', pertanyaan: '[Umum] Akses portal E-Learning/LMS mudah dan lancar.' },
+                { id: 'Q7', id_pelatihan: 'SEMUA', kategori: 'Penyelenggara', tipe: 'text', pertanyaan: '[Catatan] Tuliskan saran dan masukan Anda untuk perbaikan penyelenggaraan pelatihan.' }
+            ],
+            hasil: [
+                { id_jawaban: 'H-101', tanggal: '2026-10-05', nip: '123456789', id_pelatihan: 'P1', kategori: 'Widyaiswara', target_id: 'T1', id_pertanyaan: 'Q1', nilai: '5' }
+            ]
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (IS_PREVIEW) {
+                const notice = document.getElementById('preview-notice');
+                if (notice) notice.classList.remove('hidden');
+            }
+        });
+
+        // Dual-mode: google.script.run (hosted in GAS) atau fetch POST (embedded di Blogger/Google Sites)
+        async function callBackend(actionName, payload = {}) {
+            if (IS_PREVIEW) return handlePreviewCall(actionName, payload);
+            if (typeof google !== 'undefined' && google.script && google.script.run) {
+                return new Promise((resolve, reject) => {
+                    google.script.run
+                        .withSuccessHandler((res) => resolve(res))
+                        .withFailureHandler((err) => reject(err))
+                        [actionName](payload);
+                });
+            }
+            if (!GAS_URL || GAS_URL.includes("URL_DEPLOY_GAS_ANDA_DISINI")) {
+                throw new Error("URL deployment GAS belum diset pada variabel GAS_URL.");
+            }
+            try {
+                const response = await fetch(GAS_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: actionName, data: payload })
+                });
+                if (!response.ok) throw new Error(`Gagal terhubung ke server (HTTP Status: ${response.status})`);
+                const resData = await response.json();
+                if (resData && resData.error) throw new Error(resData.error);
+                return resData;
+            } catch (error) {
+                throw new Error(error.message || "Terjadi kesalahan koneksi ke server.");
+            }
+        }
+
+        function handlePreviewCall(action, payload) {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    if (action === 'verifikasiLogin') {
+                        if (payload.type === 'peserta') {
+                            const found = dbDummy.users.find(u => u.nip === payload.nip && u.role === 'peserta');
+                            if (found) {
+                                let userPelatihan = dbDummy.peserta_pelatihan.find(p => p.nip === found.nip);
+                                resolve({ nip: found.nip, nama: found.nama, role: 'peserta', id_pelatihan: userPelatihan ? userPelatihan.id_pelatihan : (found.id_pelatihan || 'P1') });
+                            } else resolve({ error: 'NIP tidak ditemukan pada data peserta.' });
+                        } else {
+                            const found = dbDummy.users.find(u => u.nip === payload.user && (u.password === payload.pass || payload.pass === 'admin2026' || payload.pass === 'yeswecan') && u.role === 'admin');
+                            if (found) resolve({ nip: found.nip, nama: found.nama, role: 'admin' });
+                            else resolve({ error: 'Username atau Password Admin salah.' });
+                        }
+                    } else if (action === 'getFormDataPeserta') {
+                        let userPelatihanIds = dbDummy.peserta_pelatihan.filter(p => p.nip === payload.nip).map(p => p.id_pelatihan);
+                        if (userPelatihanIds.length === 0 && payload.id_pelatihan) userPelatihanIds = [payload.id_pelatihan];
+                        let pelatihans = dbDummy.pelatihan.filter(p => userPelatihanIds.includes(p.id));
+                        if (pelatihans.length === 0) pelatihans = dbDummy.pelatihan;
+                        let questions = dbDummy.kuesioner.filter(q => q.kategori === payload.kategori);
+                        let targets = dbDummy.pengajar.filter(p => p.peran === payload.kategori);
+                        resolve({ pelatihans, questions, targets });
+                    } else if (action === 'simpanEvaluasi') {
+                        payload.answers.forEach(a => {
+                            dbDummy.hasil.push({ id_jawaban: 'H-' + Date.now(), tanggal: new Date().toISOString().split('T')[0], nip: payload.nip, id_pelatihan: payload.id_pelatihan, kategori: payload.kategori, target_id: payload.target_id, id_pertanyaan: a.id_pertanyaan, nilai: a.nilai });
+                        });
+                        resolve({ success: true });
+                    } else if (action === 'getAdminData') {
+                        let mappedUsers = dbDummy.users.map(u => {
+                            let matchP = dbDummy.peserta_pelatihan.find(pp => pp.nip === u.nip);
+                            return { ...u, id_pelatihan: matchP ? matchP.id_pelatihan : (u.id_pelatihan || '') };
+                        });
+                        resolve({ users: mappedUsers, pelatihan: dbDummy.pelatihan, pengajar: dbDummy.pengajar, master_pegawai: dbDummy.master_pegawai, kuesioner: dbDummy.kuesioner, hasil: dbDummy.hasil });
+                    } else if (action === 'simpanDataAdmin') {
+                        if (payload.sheetType === 'peserta') {
+                            let idx = dbDummy.users.findIndex(u => u.nip === payload.nip);
+                            if (idx >= 0) dbDummy.users[idx].nama = payload.nama;
+                            else dbDummy.users.push({ nip: payload.nip, nama: payload.nama, password: '', role: 'peserta', id_pelatihan: payload.id_pelatihan });
+                            let ppIdx = dbDummy.peserta_pelatihan.findIndex(pp => pp.nip === payload.nip);
+                            if (ppIdx >= 0) dbDummy.peserta_pelatihan[ppIdx].id_pelatihan = payload.id_pelatihan;
+                            else dbDummy.peserta_pelatihan.push({ nip: payload.nip, id_pelatihan: payload.id_pelatihan });
+                        } else if (payload.sheetType === 'kuesioner') {
+                            let idx = dbDummy.kuesioner.findIndex(k => k.id === payload.id);
+                            if (idx >= 0) dbDummy.kuesioner[idx] = { id: payload.id, id_pelatihan: payload.id_pelatihan, kategori: payload.kategori, tipe: payload.tipe, pertanyaan: payload.pertanyaan };
+                            else dbDummy.kuesioner.push({ id: payload.id, id_pelatihan: payload.id_pelatihan, kategori: payload.kategori, tipe: payload.tipe, pertanyaan: payload.pertanyaan });
+                        } else if (payload.sheetType === 'pelatihan') {
+                            let idx = dbDummy.pelatihan.findIndex(p => p.id === payload.id);
+                            if (idx >= 0) dbDummy.pelatihan[idx] = { id: payload.id, nama: payload.nama, tgl_mulai: payload.tgl_mulai, tgl_selesai: payload.tgl_selesai };
+                            else dbDummy.pelatihan.push({ id: payload.id, nama: payload.nama, tgl_mulai: payload.tgl_mulai, tgl_selesai: payload.tgl_selesai });
+                        } else if (payload.sheetType === 'pengajar') {
+                            let idx = dbDummy.pengajar.findIndex(p => p.id === payload.id);
+                            if (idx >= 0) dbDummy.pengajar[idx] = { id: payload.id, nama: payload.nama, peran: payload.peran, id_pelatihan: payload.id_pelatihan || 'SEMUA' };
+                            else dbDummy.pengajar.push({ id: payload.id, nama: payload.nama, peran: payload.peran, id_pelatihan: payload.id_pelatihan || 'SEMUA' });
+                        } else if (payload.sheetType === 'master_pegawai') {
+                            let idx = dbDummy.master_pegawai.findIndex(m => m.id === payload.id);
+                            if (idx >= 0) dbDummy.master_pegawai[idx] = { id: payload.id, nama: payload.nama, jabatan: payload.jabatan || '' };
+                            else dbDummy.master_pegawai.push({ id: payload.id, nama: payload.nama, jabatan: payload.jabatan || '' });
+                        }
+                        resolve({ success: true });
+                    } else if (action === 'simpanDataAdminBulk') {
+                        if (payload.type === 'peserta') {
+                            payload.data.forEach(row => {
+                                dbDummy.users.push({ nip: String(row[0]), nama: row[1], password: '', role: 'peserta', id_pelatihan: row[2] });
+                                dbDummy.peserta_pelatihan.push({ nip: String(row[0]), id_pelatihan: row[2] });
+                            });
+                        } else if (payload.type === 'kuesioner') {
+                            payload.data.forEach(row => {
+                                dbDummy.kuesioner.push({ id: row[0], id_pelatihan: row[1] || 'SEMUA', kategori: row[2], tipe: row[3], pertanyaan: row[4] });
+                            });
+                        } else if (payload.type === 'pengajar') {
+                            payload.data.forEach(row => {
+                                dbDummy.pengajar.push({ id: row[0], nama: row[1], peran: row[2], id_pelatihan: row[3] || 'SEMUA' });
+                            });
+                        } else if (payload.type === 'master_pegawai') {
+                            payload.data.forEach(row => {
+                                dbDummy.master_pegawai.push({ id: row[0], nama: row[1], jabatan: row[2] || '' });
+                            });
+                        }
+                        resolve({ success: true });
+                    } else if (action === 'hapusDataAdmin') {
+                        if (payload.type === 'peserta') { dbDummy.users = dbDummy.users.filter(u => u.nip !== payload.id); dbDummy.peserta_pelatihan = dbDummy.peserta_pelatihan.filter(p => p.nip !== payload.id); }
+                        else if (payload.type === 'kuesioner') dbDummy.kuesioner = dbDummy.kuesioner.filter(k => k.id !== payload.id);
+                        else if (payload.type === 'pelatihan') dbDummy.pelatihan = dbDummy.pelatihan.filter(p => p.id !== payload.id);
+                        else if (payload.type === 'pengajar') dbDummy.pengajar = dbDummy.pengajar.filter(p => p.id !== payload.id);
+                        else if (payload.type === 'master_pegawai') dbDummy.master_pegawai = dbDummy.master_pegawai.filter(m => m.id !== payload.id);
+                        resolve({ success: true });
+                    } else resolve({ success: true });
+                }, 350);
+            });
+        }
+
+        function showLoader(text = 'Memproses data...') {
+            document.getElementById('loader-text').innerText = text;
+            document.getElementById('loader').classList.remove('hidden');
+        }
+        function hideLoader() { document.getElementById('loader').classList.add('hidden'); }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toast-icon');
+            const msg = document.getElementById('toast-message');
+            if (toastTimeout) clearTimeout(toastTimeout);
+            msg.innerText = message;
+            toast.className = 'fixed bottom-5 right-5 z-[100001] transform transition-all duration-300 flex items-center p-4 rounded-xl shadow-2xl text-white font-medium max-w-md cursor-pointer select-none hover:opacity-95 translate-x-0';
+            if (type === 'success') { toast.classList.add('bg-emerald-600'); icon.innerHTML = '<i class="fa-solid fa-circle-check"></i>'; }
+            else if (type === 'error') { toast.classList.add('bg-rose-600'); icon.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i>'; }
+            else { toast.classList.add('bg-blue-600'); icon.innerHTML = '<i class="fa-solid fa-circle-info"></i>'; }
+            toastTimeout = setTimeout(() => { hideToast(); }, 1800);
+        }
+        function hideToast() {
+            const toast = document.getElementById('toast');
+            if (toast) toast.classList.add('translate-x-full');
+        }
+
+        function switchLoginTab(type) {
+            const formPeserta = document.getElementById('form-login-peserta');
+            const formAdmin = document.getElementById('form-login-admin');
+            const tabPeserta = document.getElementById('tab-peserta');
+            const tabAdmin = document.getElementById('tab-admin');
+            if (type === 'peserta') {
+                formPeserta.classList.remove('hidden'); formAdmin.classList.add('hidden');
+                tabPeserta.className = "w-1/2 py-2.5 text-center font-semibold text-blue-600 border-b-2 border-blue-600 transition-all";
+                tabAdmin.className = "w-1/2 py-2.5 text-center font-medium text-gray-400 border-b-2 border-transparent hover:text-gray-600 transition-all";
+            } else {
+                formPeserta.classList.add('hidden'); formAdmin.classList.remove('hidden');
+                tabAdmin.className = "w-1/2 py-2.5 text-center font-semibold text-blue-600 border-b-2 border-blue-600 transition-all";
+                tabPeserta.className = "w-1/2 py-2.5 text-center font-medium text-gray-400 border-b-2 border-transparent hover:text-gray-600 transition-all";
+            }
+        }
+
+        async function handleLogin(e, type) {
+            e.preventDefault();
+            showLoader('Memverifikasi akun...');
+            let payload = (type === 'peserta')
+                ? { nip: document.getElementById('nip').value.trim(), type: 'peserta' }
+                : { user: document.getElementById('username').value.trim(), pass: document.getElementById('password').value.trim(), type: 'admin' };
+            try {
+                const res = await callBackend('verifikasiLogin', payload);
+                if (res && res.error) { showToast(res.error, 'error'); }
+                else if (res && res.role) {
+                    currentUser = res;
+                    document.getElementById('view-login').classList.add('hidden');
+                    hideToast();
+                    if (res.role === 'admin') {
+                        document.getElementById('view-admin').classList.remove('hidden');
+                        loadAdminMenu('dashboard');
+                    } else {
+                        document.getElementById('view-peserta').classList.remove('hidden');
+                        document.getElementById('peserta-name-display').innerText = `${res.nama} (${res.nip})`;
+                        document.getElementById('peserta-pelatihan-display').innerText = `Pelatihan: ${res.id_pelatihan || 'Belum terdaftar'}`;
+                        loadPesertaMenu('beranda');
+                    }
+                } else showToast('Respon tidak valid dari server.', 'error');
+            } catch (err) {
+                showToast(err.message || 'Gagal terhubung ke server login.', 'error');
+            } finally { hideLoader(); }
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('view-admin').classList.add('hidden');
+            document.getElementById('view-peserta').classList.add('hidden');
+            document.getElementById('view-login').classList.remove('hidden');
+            document.getElementById('nip').value = '';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            hideToast();
+        }
+
+        function loadPesertaMenu(menu) {
+            const menus = ['beranda', 'Widyaiswara', 'Coach', 'Mentor', 'Penguji', 'Penyelenggara', 'Sarpras', 'LMS'];
+            menus.forEach(m => {
+                const el = document.getElementById('menu-p-' + m);
+                if (el) el.className = `flex items-center gap-3 px-6 py-3 text-sm transition-all ${m === menu ? 'bg-blue-50 text-blue-600 font-semibold border-r-4 border-blue-600' : 'text-gray-600 hover:bg-gray-50'}`;
+            });
+            activePesertaMenu = menu;
+            const container = document.getElementById('peserta-content');
+            container.innerHTML = '';
+            if (menu === 'beranda') renderPesertaBeranda(container);
+            else renderFormEvaluasi(menu, container);
+        }
+
+        function renderPesertaBeranda(container) {
+            let html = `
+                <div class="mb-8">
+                    <h1 class="text-2xl font-bold text-gray-800">Selamat Datang, ${currentUser.nama}</h1>
+                    <p class="text-gray-500 text-sm mt-1">Pilih kategori kuesioner di bawah ini. Pertanyaan & daftar pengajar otomatis disesuaikan dengan jenis pelatihan yang Anda ikuti.</p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                    <h3 class="font-bold text-gray-800 mb-4 border-b pb-3 flex items-center gap-2"><i class="fa-solid fa-list-check text-blue-600"></i> Kategori Evaluasi Pelatihan</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">`;
+            const menus = ['Widyaiswara', 'Coach', 'Mentor', 'Penguji', 'Penyelenggara', 'Sarpras', 'LMS'];
+            const icons = ['fa-chalkboard-user', 'fa-user-tie', 'fa-user-graduate', 'fa-clipboard-user', 'fa-building', 'fa-building-columns', 'fa-laptop-code'];
+            menus.forEach((m, idx) => {
+                html += `
+                    <div class="border border-gray-200 rounded-xl p-4 flex items-center justify-between hover:border-blue-400 hover:shadow-md transition-all cursor-pointer bg-gray-50/50" onclick="loadPesertaMenu('${m}')">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center font-bold"><i class="fa-solid ${icons[idx]}"></i></div>
+                            <div><p class="font-semibold text-sm text-gray-800">Evaluasi ${m}</p><p class="text-[11px] text-gray-400">Isi penilaian</p></div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-gray-400 text-xs"></i>
+                    </div>`;
+            });
+            html += `</div></div>`;
+            container.innerHTML = html;
+        }
+
+        async function renderFormEvaluasi(kategori, container) {
+            showLoader('Memuat kuesioner...');
+            try {
+                const res = await callBackend('getFormDataPeserta', { nip: currentUser.nip, kategori: kategori, id_pelatihan: currentUser.id_pelatihan });
+                currentPesertaFormData = res;
+                buildFormHTML(kategori, container, res.pelatihans || [], res.questions || [], res.targets || []);
+            } catch (err) {
+                showToast(err.message || 'Gagal memuat form evaluasi.', 'error');
+            } finally { hideLoader(); }
+        }
+
+        function buildFormHTML(kategori, container, pelatihans, questions, targets) {
+            let userDefaultPelatihanId = currentUser.id_pelatihan || (pelatihans.length > 0 ? pelatihans[0].id : '');
+            let html = `
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="bg-blue-600 p-6 text-white">
+                        <h2 class="text-lg font-bold flex items-center gap-2"><i class="fa-solid fa-pen-to-square"></i> Form Evaluasi ${kategori}</h2>
+                        <p class="text-blue-100 text-xs mt-1">Isi kuesioner dengan jujur dan obyektif. Pertanyaan & pengajar telah disesuaikan dengan jenis pelatihan Anda.</p>
+                    </div>
+                    <form id="form-evaluasi" class="p-6 md:p-8" onsubmit="submitEvaluasi(event, '${kategori}')">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                            <div>
+                                <label class="block text-gray-700 text-xs font-bold uppercase tracking-wider mb-2">Jenis Pelatihan Yang Diikuti <span class="text-red-500">*</span></label>
+                                <select id="eval-pelatihan" required onchange="filterFormByPelatihan('${kategori}')" class="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-blue-500 bg-blue-50/50 font-medium text-sm">
+                                    ${pelatihans.map(p => `<option value="${p.id}" ${p.id === userDefaultPelatihanId ? 'selected' : ''}>[${p.id}] ${p.nama}</option>`).join('')}
+                                </select>
+                                <p class="text-[11px] text-gray-400 mt-1"><i class="fa-solid fa-circle-check text-emerald-500 mr-1"></i>Otomatis tertuju ke pelatihan yang terdaftar atas nama Anda.</p>
+                            </div>`;
+            if (targets && targets.length > 0) {
+                html += `
+                            <div>
+                                <label class="block text-gray-700 text-xs font-bold uppercase tracking-wider mb-2">Pilih ${kategori} yang Dievaluasi <span class="text-red-500">*</span></label>
+                                <select id="eval-target" required class="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-blue-500 bg-gray-50 text-sm">
+                                    <option value="">-- Pilih Pengajar/SDM --</option>
+                                    ${renderTargetOptionsHTML(targets, userDefaultPelatihanId)}
+                                </select>
+                                <p class="text-[11px] text-gray-400 mt-1"><i class="fa-solid fa-user-tie text-blue-500 mr-1"></i>Hanya pengajar yang terdaftar pada pelatihan ini yang tampil.</p>
+                            </div>`;
+            } else {
+                html += `<input type="hidden" id="eval-target" value="-">`;
+            }
+            html += `</div>
+                        <div class="pt-6 border-t border-gray-200">
+                            <h3 class="font-bold text-sm text-gray-800 uppercase tracking-wider mb-4">Daftar Pertanyaan Kuesioner</h3>
+                            <div id="question-list-container">`;
+            html += renderQuestionListHTML(questions, userDefaultPelatihanId);
+            html += `</div></div>
+                        <div class="mt-8 pt-6 border-t flex justify-end">
+                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg shadow-blue-500/20 transition-all flex items-center gap-2 text-sm">
+                                <i class="fa-solid fa-paper-plane"></i> Kirim Jawaban Evaluasi
+                            </button>
+                        </div>
+                    </form>
+                </div>`;
+            container.innerHTML = html;
+        }
+
+        // v2.2: opsi pengajar difilter berdasarkan jenis pelatihan (cocok ATAU "SEMUA")
+        function renderTargetOptionsHTML(targets, selectedPelatihanId) {
+            let filtered = targets.filter(t => !t.id_pelatihan || t.id_pelatihan === 'SEMUA' || t.id_pelatihan === selectedPelatihanId);
+            if (filtered.length === 0) return `<option value="" disabled>Tidak ada pengajar/SDM untuk pelatihan ini</option>`;
+            return filtered.map(t => `<option value="${t.id}">${t.nama}</option>`).join('');
+        }
+
+        // v2.2: saat dropdown pelatihan berubah, refresh BOTH daftar pertanyaan DAN daftar pengajar
+        function filterFormByPelatihan(kategori) {
+            const selectedPelatihanId = document.getElementById('eval-pelatihan').value;
+            const qContainer = document.getElementById('question-list-container');
+            if (currentPesertaFormData && currentPesertaFormData.questions) {
+                qContainer.innerHTML = renderQuestionListHTML(currentPesertaFormData.questions, selectedPelatihanId);
+            }
+            const targetSelect = document.getElementById('eval-target');
+            if (targetSelect && currentPesertaFormData && currentPesertaFormData.targets) {
+                targetSelect.innerHTML = `<option value="">-- Pilih Pengajar/SDM --</option>` + renderTargetOptionsHTML(currentPesertaFormData.targets, selectedPelatihanId);
+            }
+        }
+        function filterQuestionsByPelatihan(kategori) { filterFormByPelatihan(kategori); } // alias backward-compatible
+
+        function renderQuestionListHTML(questions, selectedPelatihanId) {
+            let filtered = questions.filter(q => !q.id_pelatihan || q.id_pelatihan === 'SEMUA' || q.id_pelatihan === selectedPelatihanId);
+            if (filtered.length === 0) {
+                return `<div class="bg-amber-50 text-amber-800 p-6 rounded-2xl border border-amber-200 flex items-center gap-4">
+                    <i class="fa-solid fa-folder-open text-3xl text-amber-600"></i>
+                    <div><h3 class="font-bold text-base">Belum Ada Pertanyaan Khusus</h3>
+                    <p class="text-xs text-amber-700 mt-0.5">Admin belum menambahkan kuesioner kategori ini untuk pelatihan ID: <strong>${selectedPelatihanId}</strong>.</p></div></div>`;
+            }
+            let html = `<div class="space-y-6">`;
+            filtered.forEach((q, idx) => {
+                html += `<div class="bg-gray-50 p-5 rounded-xl border border-gray-200">
+                    <p class="font-semibold text-gray-800 text-sm mb-3"><span class="text-blue-600 mr-2">${idx + 1}.</span>${q.pertanyaan}</p>`;
+                if (q.tipe === 'likert') {
+                    html += `<div class="flex flex-wrap gap-4 mt-2 ml-4">
+                        <label class="flex items-center gap-2 cursor-pointer text-xs text-gray-700 hover:text-blue-600"><input type="radio" name="q_${q.id}" value="5" required class="w-4 h-4 text-blue-600"> 5 - Sangat Baik</label>
+                        <label class="flex items-center gap-2 cursor-pointer text-xs text-gray-700 hover:text-blue-600"><input type="radio" name="q_${q.id}" value="4" required class="w-4 h-4 text-blue-600"> 4 - Baik</label>
+                        <label class="flex items-center gap-2 cursor-pointer text-xs text-gray-700 hover:text-blue-600"><input type="radio" name="q_${q.id}" value="3" required class="w-4 h-4 text-blue-600"> 3 - Cukup</label>
+                        <label class="flex items-center gap-2 cursor-pointer text-xs text-gray-700 hover:text-blue-600"><input type="radio" name="q_${q.id}" value="2" required class="w-4 h-4 text-blue-600"> 2 - Kurang</label>
+                        <label class="flex items-center gap-2 cursor-pointer text-xs text-gray-700 hover:text-blue-600"><input type="radio" name="q_${q.id}" value="1" required class="w-4 h-4 text-blue-600"> 1 - Sangat Kurang</label>
+                    </div>`;
+                } else if (q.tipe === 'text') {
+                    html += `<div class="ml-4 mt-2">
+                        <textarea name="q_${q.id}" rows="3" placeholder="Tulis catatan, saran, atau masukan Anda di sini (opsional)..." class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm resize-y"></textarea>
+                        <p class="text-[11px] text-gray-400 mt-1"><i class="fa-solid fa-pen-nib mr-1"></i>Catatan bebas - boleh dikosongkan.</p>
+                    </div>`;
+                } else {
+                    html += `<div class="ml-4 flex items-center gap-3">
+                        <input type="number" name="q_${q.id}" min="0" max="100" required placeholder="0-100" class="w-28 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm">
+                        <span class="text-xs text-gray-500">(Rentang Nilai 0 - 100)</span>
+                    </div>`;
+                }
+                html += `</div>`;
+            });
+            html += `</div>`;
+            return html;
+        }
+
+        async function submitEvaluasi(e, kategori) {
+            e.preventDefault();
+            const form = document.getElementById('form-evaluasi');
+            const formData = new FormData(form);
+            let id_pelatihan = document.getElementById('eval-pelatihan').value;
+            let target_id = document.getElementById('eval-target').value;
+            let answers = [];
+            for (let [key, value] of formData.entries()) {
+                if (key.startsWith('q_')) answers.push({ id_pertanyaan: key.replace('q_', ''), nilai: value });
+            }
+            const hasTextQuestion = document.querySelectorAll('#form-evaluasi textarea[name^="q_"]').length > 0;
+            if (answers.length === 0 && !hasTextQuestion) { showToast('Tidak ada pertanyaan yang dijawab.', 'error'); return; }
+            const dataToSave = { nip: currentUser.nip, id_pelatihan: id_pelatihan, kategori: kategori, target_id: target_id, answers: answers };
+            showLoader('Menyimpan hasil evaluasi...');
+            try {
+                const res = await callBackend('simpanEvaluasi', dataToSave);
+                if (res && res.success) { showToast('Terima kasih! Evaluasi Anda berhasil disimpan.', 'success'); loadPesertaMenu('beranda'); }
+                else showToast(res.message || 'Gagal menyimpan jawaban.', 'error');
+            } catch (err) {
+                showToast(err.message || 'Terjadi kesalahan saat mengirim jawaban.', 'error');
+            } finally { hideLoader(); }
+        }
+
+        async function loadAdminMenu(menu) {
+            const menus = ['dashboard', 'master_pegawai', 'pelatihan', 'peserta', 'widyaiswara', 'coach', 'mentor', 'penguji', 'kuesioner', 'hasil'];
+            menus.forEach(m => {
+                const el = document.getElementById('menu-a-' + m);
+                if (el) el.className = `flex items-center gap-3 px-6 py-3 text-sm transition-all ${m === menu ? 'bg-slate-800 text-white border-l-4 border-blue-500 font-semibold' : 'text-slate-300 hover:bg-slate-800 hover:text-white border-l-4 border-transparent'}`;
+            });
+            activeAdminMenu = menu;
+            const container = document.getElementById('admin-content');
+            container.innerHTML = '';
+            showLoader('Memuat data master...');
+            try {
+                const data = await callBackend('getAdminData');
+                currentAdminData = data;
+                renderAdminContent(menu, container, data);
+            } catch (err) {
+                showToast(err.message || 'Gagal mengambil data dari server.', 'error');
+            } finally { hideLoader(); }
+        }
+
+        function renderAdminContent(menu, container, data) {
+            if (menu === 'dashboard') {
+                container.innerHTML = `
+                    <h2 class="text-xl font-bold text-slate-800 mb-6">Dashboard Ringkasan Sistem</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-blue-500"><p class="text-xs font-bold text-gray-400 uppercase">Jenis Pelatihan</p><p class="text-3xl font-extrabold text-slate-800 mt-2">${data.pelatihan ? data.pelatihan.length : 0}</p></div>
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-emerald-500"><p class="text-xs font-bold text-gray-400 uppercase">Peserta Terdaftar</p><p class="text-3xl font-extrabold text-slate-800 mt-2">${data.users ? data.users.filter(u => u.role === 'peserta').length : 0}</p></div>
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-purple-500"><p class="text-xs font-bold text-gray-400 uppercase">Pengajar / SDM</p><p class="text-3xl font-extrabold text-slate-800 mt-2">${data.pengajar ? data.pengajar.length : 0}</p></div>
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-amber-500"><p class="text-xs font-bold text-gray-400 uppercase">Soal Kuesioner</p><p class="text-3xl font-extrabold text-slate-800 mt-2">${data.kuesioner ? data.kuesioner.length : 0}</p></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                        <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2"><i class="fa-solid fa-circle-info text-blue-600"></i> Panduan Fitur (v2.4)</h3>
+                        <ul class="text-sm text-gray-600 space-y-2 list-disc list-inside">
+                            <li><strong>Master Pegawai</strong>: daftar pegawai yang akan ditugaskan sebagai pengajar. Saat menambah Widyaiswara/Coach/Mentor/Penguji, cukup pilih dari master (ID & Nama otomatis terisi).</li>
+                            <li>Menu <strong>Pengajar / SDM</strong> dipisah menjadi empat: Widyaiswara, Coach, Mentor, Penguji. Peran otomatis terisi sesuai menu.</li>
+                            <li>Setiap pengajar/SDM dapat diikat ke jenis pelatihan tertentu (atau "SEMUA"), sehingga saat peserta evaluasi hanya muncul pengajar yang mengajar di pelatihan tersebut.</li>
+                            <li>Setiap <strong>pertanyaan kuesioner</strong> dapat diatur khusus untuk jenis pelatihan tertentu (atau "SEMUA").</li>
+                            <li>Setiap <strong>peserta</strong> yang didaftarkan wajib memilih jenis pelatihan yang diikuti.</li>
+                            <li>Tipe penilaian: <strong>Likert (1-5)</strong>, <strong>Angka (0-100)</strong>, dan <strong>Teks/Catatan</strong> (opsional).</li>
+                            <li>Menu <strong>Hasil Evaluasi</strong> dapat difilter berdasarkan jenis pelatihan.</li>
+                        </ul>
+                    </div>`;
+            } else if (['master_pegawai', 'pelatihan', 'peserta', 'widyaiswara', 'coach', 'mentor', 'penguji', 'kuesioner'].includes(menu)) {
+                buildCrudTable(menu, data, container);
+            } else if (menu === 'hasil') {
+                renderHasilEvaluasiView(data, container);
+            }
+        }
+
+        function renderHasilEvaluasiView(data, container) {
+            let pelatihans = data.pelatihan || [];
+            let hasilList = data.hasil || [];
+            let html = `
+                <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+                    <div><h2 class="text-xl font-bold text-slate-800">Laporan Hasil Evaluasi Masuk</h2>
+                    <p class="text-xs text-gray-500 mt-0.5">Saring laporan berdasarkan jenis pelatihan yang diselenggarakan.</p></div>
+                    <div class="flex items-center gap-2 bg-white p-2 rounded-xl shadow-sm border border-gray-200">
+                        <i class="fa-solid fa-filter text-blue-600 ml-2"></i>
+                        <span class="text-xs font-bold text-gray-600">Filter Pelatihan:</span>
+                        <select id="filter-pelatihan" onchange="applyHasilFilter()" class="text-xs bg-gray-50 border rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-blue-500 font-semibold">
+                            <option value="ALL">-- Semua Pelatihan --</option>
+                            ${pelatihans.map(p => `<option value="${p.id}">[${p.id}] ${p.nama}</option>`).join('')}
+                        </select>
+                    </div>
+                </div>
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead><tr class="bg-gray-100 text-gray-700 text-xs uppercase">
+                            <th class="p-4 border-b">ID Jawaban</th><th class="p-4 border-b">NIP Peserta</th><th class="p-4 border-b">Jenis Pelatihan</th><th class="p-4 border-b">Kategori</th><th class="p-4 border-b">Target SDM</th><th class="p-4 border-b">ID Soal</th><th class="p-4 border-b">Nilai / Jawaban</th>
+                        </tr></thead>
+                        <tbody id="tbl-hasil-body">`;
+            html += renderHasilRowsHTML(hasilList, 'ALL');
+            html += `</tbody></table></div>`;
+            container.innerHTML = html;
+        }
+
+        function applyHasilFilter() {
+            const filterVal = document.getElementById('filter-pelatihan').value;
+            const tbody = document.getElementById('tbl-hasil-body');
+            if (currentAdminData && currentAdminData.hasil) tbody.innerHTML = renderHasilRowsHTML(currentAdminData.hasil, filterVal);
+        }
+
+        function renderHasilRowsHTML(hasilList, filterPelatihanId) {
+            let filtered = hasilList;
+            if (filterPelatihanId && filterPelatihanId !== 'ALL') filtered = hasilList.filter(h => h.id_pelatihan === filterPelatihanId);
+            if (filtered.length === 0) return `<tr><td colspan="7" class="p-8 text-center text-gray-400">Belum ada data evaluasi untuk pelatihan ini.</td></tr>`;
+            return filtered.map(h => `
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="p-4 font-mono text-xs">${h.id_jawaban}</td>
+                    <td class="p-4 font-medium">${h.nip}</td>
+                    <td class="p-4"><span class="px-2.5 py-1 bg-amber-100 text-amber-900 rounded-full text-xs font-semibold">${h.id_pelatihan || '-'}</span></td>
+                    <td class="p-4"><span class="px-2.5 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold">${h.kategori}</span></td>
+                    <td class="p-4">${h.target_id || '-'}</td>
+                    <td class="p-4 font-mono text-xs">${h.id_pertanyaan}</td>
+                    <td class="p-4 font-bold text-gray-800 max-w-xs truncate" title="${String(h.nilai || '').replace(/"/g, '&quot;')}">${String(h.nilai || '').length > 40 ? String(h.nilai).substring(0, 40) + '...' : h.nilai}</td>
+                </tr>`).join('');
+        }
+
+        function buildCrudTable(type, data, container) {
+            let title = '', headers = [], rows = [], dataset = [];
+            // v2.3: empat menu peran SDM dipisah, masing-masing filter by peran
+            const roleMap = { widyaiswara: 'Widyaiswara', coach: 'Coach', mentor: 'Mentor', penguji: 'Penguji' };
+            const isRoleMenu = Object.prototype.hasOwnProperty.call(roleMap, type);
+            const roleFilter = isRoleMenu ? roleMap[type] : null;
+            if (type === 'master_pegawai') {
+                title = 'Kelola Master Pegawai (Referensi Pengajar/SDM)';
+                headers = ['ID Pegawai', 'Nama Lengkap', 'Jabatan / Unit'];
+                dataset = data.master_pegawai || [];
+                rows = dataset.map(d => [d.id, d.nama, d.jabatan || '-']);
+            } else if (type === 'pelatihan') {
+                title = 'Kelola Master Jenis Pelatihan';
+                headers = ['ID Pelatihan', 'Nama Pelatihan', 'Tanggal Mulai', 'Tanggal Selesai'];
+                dataset = data.pelatihan || [];
+                rows = dataset.map(d => [d.id, d.nama, d.tgl_mulai, d.tgl_selesai]);
+            } else if (type === 'peserta') {
+                title = 'Kelola Master Peserta';
+                headers = ['NIP / Username', 'Nama Lengkap', 'Jenis Pelatihan Diikuti', 'Role'];
+                dataset = (data.users || []).filter(u => u.role === 'peserta');
+                rows = dataset.map(d => [d.nip, d.nama, `<span class="px-2.5 py-0.5 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold">${d.id_pelatihan || 'Belum Set'}</span>`, `<span class="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 rounded-full text-xs font-semibold">${d.role}</span>`]);
+            } else if (type === 'pengajar' || isRoleMenu) {
+                title = isRoleMenu ? `Kelola ${roleFilter}` : 'Kelola Pengajar / SDM';
+                headers = isRoleMenu ? ['ID Pegawai', 'Nama Lengkap', 'Jenis Pelatihan'] : ['ID Pegawai', 'Nama Lengkap', 'Peran SDM', 'Jenis Pelatihan'];
+                dataset = (data.pengajar || []).filter(d => !roleFilter || d.peran === roleFilter);
+                rows = dataset.map(d => {
+                    let r = [d.id, d.nama];
+                    if (!isRoleMenu) r.push(`<span class="px-2.5 py-0.5 bg-purple-100 text-purple-800 rounded-full text-xs font-semibold">${d.peran}</span>`);
+                    r.push(`<span class="px-2.5 py-0.5 bg-amber-100 text-amber-900 rounded-full text-xs font-semibold">${d.id_pelatihan || 'SEMUA'}</span>`);
+                    return r;
+                });
+            } else if (type === 'kuesioner') {
+                title = 'Kelola Bank Kuesioner (per Jenis Pelatihan)';
+                headers = ['ID Soal', 'Jenis Pelatihan', 'Kategori', 'Tipe Skala', 'Isi Pertanyaan'];
+                dataset = data.kuesioner || [];
+                rows = dataset.map(d => [d.id, `<span class="px-2.5 py-0.5 bg-amber-100 text-amber-900 rounded-full text-xs font-semibold">${d.id_pelatihan || 'SEMUA'}</span>`, d.kategori, d.tipe === 'likert' ? 'Likert (1-5)' : (d.tipe === 'text' ? 'Teks/Uraian' : 'Angka (0-100)'), (d.pertanyaan || '').substring(0, 55) + '...']);
+            }
+
+            let actionButtons = `<button onclick="openModal('${type}', 'add')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl shadow-sm flex items-center gap-2 text-sm font-semibold transition-all"><i class="fa-solid fa-plus"></i> Tambah Manual</button>`;
+            if (['master_pegawai', 'peserta', 'pengajar', 'widyaiswara', 'coach', 'mentor', 'penguji', 'kuesioner'].includes(type)) {
+                actionButtons += `
+                    <button onclick="downloadTemplate('${type}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl shadow-sm flex items-center gap-2 text-sm font-semibold transition-all"><i class="fa-solid fa-file-excel"></i> Template Excel</button>
+                    <button onclick="document.getElementById('file-upload-${type}').click()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl shadow-sm flex items-center gap-2 text-sm font-semibold transition-all"><i class="fa-solid fa-file-import"></i> Import Excel</button>
+                    <input type="file" id="file-upload-${type}" class="hidden" accept=".xlsx, .xls" onchange="handleExcelUpload(event, '${type}')">`;
+            }
+
+            let html = `
+                <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4"><h2 class="text-xl font-bold text-slate-800">${title}</h2><div class="flex flex-wrap items-center gap-2">${actionButtons}</div></div>
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead><tr class="bg-gray-100 text-gray-700 text-xs uppercase">
+                            ${headers.map(h => `<th class="p-4 border-b whitespace-nowrap">${h}</th>`).join('')}
+                            <th class="p-4 border-b text-right whitespace-nowrap">Aksi</th>
+                        </tr></thead>
+                        <tbody>
+                            ${rows.length === 0 ? `<tr><td colspan="${headers.length + 1}" class="p-8 text-center text-gray-400">Data belum tersedia.</td></tr>` :
+                                rows.map((r, idx) => `<tr class="border-b hover:bg-gray-50">
+                                    ${r.map(cell => `<td class="p-4">${cell}</td>`).join('')}
+                                    <td class="p-4 text-right whitespace-nowrap">
+                                        <button onclick="openModal('${type}', 'edit', '${dataset[idx].id || dataset[idx].nip}')" class="text-amber-600 hover:bg-amber-50 p-2 rounded-lg transition-all mr-1"><i class="fa-solid fa-pen"></i></button>
+                                        <button onclick="deleteData('${type}', '${dataset[idx].id || dataset[idx].nip}')" class="text-rose-600 hover:bg-rose-50 p-2 rounded-lg transition-all"><i class="fa-solid fa-trash"></i></button>
+                                    </td></tr>`).join('')}
+                        </tbody>
+                    </table>
+                </div>`;
+            container.innerHTML = html;
+        }
+
+        function downloadTemplate(type) {
+            let wb = XLSX.utils.book_new();
+            let ws_data = [], fileName = '';
+            if (type === 'master_pegawai') {
+                fileName = 'Template_Import_Master_Pegawai.xlsx';
+                ws_data = [['ID_Pegawai', 'Nama_Lengkap', 'Jabatan'], ['198001012005011001', 'Dr. Achmad Fauzi, M.Si', 'Widyaiswara Ahli Madya'], ['198505052010012002', 'Ir. Budi Santoso, M.T.', 'Analis SDM']];
+            } else if (type === 'peserta') {
+                fileName = 'Template_Import_Peserta.xlsx';
+                ws_data = [['NIP_Username', 'Nama_Lengkap', 'ID_Pelatihan'], ['198201012005011001', 'Budi Santoso', 'P1'], ['199011122014022003', 'Siti Aminah', 'P2']];
+            } else if (['pengajar','widyaiswara','coach','mentor','penguji'].includes(type)) {
+                fileName = 'Template_Import_Pengajar.xlsx';
+                // v2.2: format: ID_Pegawai, Nama, Peran, ID_Pelatihan
+                ws_data = [['ID_Pegawai', 'Nama', 'Peran', 'ID_Pelatihan'], ['PGJ-01', 'Dr. Achmad, M.Si', 'Widyaiswara', 'P1'], ['PGJ-02', 'Ir. Budi, M.T.', 'Coach', 'P2'], ['PGJ-03', 'Dewi Lestari, S.Pd.', 'Mentor', 'SEMUA']];
+            } else if (type === 'kuesioner') {
+                fileName = 'Template_Import_Kuesioner.xlsx';
+                ws_data = [['ID_Pertanyaan', 'ID_Pelatihan', 'Kategori', 'Tipe', 'Pertanyaan'], ['Q-PKA-01', 'P1', 'Widyaiswara', 'likert', 'Materi disajikan dengan sangat runtut.'], ['Q-PKP-01', 'P2', 'Penyelenggara', '100', 'Berapa nilai pelayanan panitia (0-100)?'], ['Q-ALL-01', 'SEMUA', 'LMS', 'likert', 'Akses platform e-learning mudah.'], ['Q-CAT-01', 'SEMUA', 'Penyelenggara', 'text', 'Tuliskan saran dan masukan Anda untuk perbaikan penyelenggaraan.']];
+            }
+            let ws = XLSX.utils.aoa_to_sheet(ws_data);
+            XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+            XLSX.writeFile(wb, fileName);
+        }
+
+        function handleExcelUpload(event, type) {
+            const file = event.target.files[0];
+            if (!file) return;
+            showLoader('Membaca berkas Excel...');
+            const reader = new FileReader();
+            reader.onload = async function (e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                    let jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                    if (jsonData.length <= 1) { showToast('Berkas Excel kosong atau hanya berisi baris header.', 'error'); return; }
+                    jsonData.shift();
+                    jsonData = jsonData.filter(row => row.length > 0 && row[0]);
+                    showLoader('Mengunggah data ke database...');
+                    const backendType = (['widyaiswara','coach','mentor','penguji'].includes(type)) ? 'pengajar' : type;
+                    const res = await callBackend('simpanDataAdminBulk', { type: backendType, data: jsonData });
+                    if (res && res.success) { showToast(`Berhasil mengimpor ${jsonData.length} data!`, 'success'); loadAdminMenu(type); }
+                    else showToast(res.message || 'Gagal mengimpor data.', 'error');
+                } catch (err) {
+                    showToast('Gagal memproses file Excel: ' + err.message, 'error');
+                } finally { hideLoader(); event.target.value = ''; }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function openModal(type, action, id = null) {
+            const modal = document.getElementById('crud-modal');
+            const title = document.getElementById('modal-title');
+            const body = document.getElementById('modal-body');
+            const btn = document.getElementById('modal-save-btn');
+            modal.classList.remove('hidden');
+            let html = `<form id="crud-form" class="space-y-4"><input type="hidden" name="action" value="${action}">`;
+            let pelatihans = (currentAdminData && currentAdminData.pelatihan) ? currentAdminData.pelatihan : [];
+            let item = {};
+            if (action === 'edit' && currentAdminData) {
+                let dataset = [];
+                if (type === 'pelatihan') dataset = currentAdminData.pelatihan || [];
+                if (type === 'peserta') dataset = (currentAdminData.users || []).filter(u => u.role === 'peserta');
+                if (['pengajar','widyaiswara','coach','mentor','penguji'].includes(type)) dataset = currentAdminData.pengajar || [];
+                if (type === 'master_pegawai') dataset = currentAdminData.master_pegawai || [];
+                if (type === 'kuesioner') dataset = currentAdminData.kuesioner || [];
+                item = dataset.find(d => (d.id || d.nip) === id) || {};
+                html += `<input type="hidden" name="old_id" value="${id}">`;
+            }
+
+            if (type === 'master_pegawai') {
+                title.innerText = action === 'add' ? 'Tambah Pegawai ke Master' : 'Edit Master Pegawai';
+                html += `
+                    <div><label class="block text-xs font-bold uppercase text-gray-600 mb-1">ID Pegawai (NIP)</label><input type="text" name="id" value="${item.id || ''}" required class="w-full px-3 py-2 border rounded-xl text-sm" placeholder="Contoh: 198001012005011001" ${action === 'edit' ? 'readonly bg-gray-100' : ''}></div>
+                    <div><label class="block text-xs font-bold uppercase text-gray-600 mb-1">Nama Lengkap & Gelar</label><input type="text" name="nama" value="${item.nama || ''}" required class="w-full px-3 py-2 border rounded-xl text-sm"></div>
+                    <div><label class="block text-xs font-bold uppercase text-gray-600 mb-1">Jabatan / Unit (opsional)</label><input type="text" name="jabatan" value="${item.jabatan || ''}" class="w-full px-3 py-2 border rounded-xl text-sm" placeholder="Contoh: Widyaiswara Ahli Madya"></div>
+                    <p class="text-[11px] text-gray-400"><i class="fa-solid fa-circle-info mr-1"></i>Data master ini akan muncul sebagai pilihan saat menambah pengajar (Widyaiswara/Coach/Mentor/Penguji).</p>`;
+            } else if (type === 'pelatihan') {
+                title.innerText = action === 'add' ? 'Tambah Jenis Pelatihan Baru' : 'Edit Jenis Pelatihan';
+                html += `
+                    <div><label class="block text-xs font-bold uppercase text-gray-600 mb-1">ID Pelatihan</label><input type="text" name="id" value="${item.id || ''}" required class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 text-sm" placeholder="Contoh: P1" ${action === 'edit' ? 'readonly bg-gray-100' : ''}></div>
+                    <div><label class="block text-xs font-bold uppercase text-gray-600 mb-1">Nama Pelatihan</label><input type="text" name="nama" value="${item.nama || ''}" required class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 text-sm"></div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div><label class="block text-xs font-bold uppercase text-gray-600 mb-1">Tgl Mulai</label><input type="date" name="tgl_mulai" value="${item.tgl_mulai || ''}" required class="w-full px-3 py-2 border rounded-xl text-sm"></div>
+                        <div><label class="block text-xs font-bold uppercase text-gray-600 mb-1">Tgl Selesai</label><input type="date" name="tgl_selesai" value="${item.tgl_selesai || ''}" required class="w-full px-3 py-2 border rounded-xl text-sm"></div>
+                    </div>`;
+            } else if (type === 'peserta') {
+                title.innerText = action === 'add' ? 'Tambah Peserta Baru' : 'Edit Peserta';
+                html += `
+                    <div><label class="block text-xs font-bold uppercase text-gray-600 mb-1">NIP (Username)</label><input type="text" name="nip" value="${item.nip || ''}" required class="w-full px-3 py-2 border rounded-xl text-sm" ${action === 'edit' ? 'readonly bg-gray-100' : ''}></div>
+                    <div><label class="block text-xs font-bold uppercase text-gray-600 mb-1">Nama Lengkap</label><input type="text" name="nama" value="${item.nama || ''}" required class="w-full px-3 py-2 border rounded-xl text-sm"></div>
+                    <div><label class="block text-xs font-bold uppercase text-gray-600 mb-1">Jenis Pelatihan Yang Diikuti <span class="text-red-500">*</span></label>
+                        <select name="id_pelatihan" required class="w-full px-3 py-2 border rounded-xl text-sm bg-gray-50">
+                            <option value="">-- Pilih Jenis Pelatihan --</option>
+                            ${pelatihans.map(p => `<option value="${p.id}" ${item.id_pelatihan === p.id ? 'selected' : ''}>[${p.id}] ${p.nama}</option>`).join('')}
+                        </select>
+                        <p class="text-[11px] text-gray-400 mt-1">Peserta hanya akan melihat kuesioner & pengajar sesuai jenis pelatihan ini.</p>
+                    </div>
+                    <input type="hidden" name="role" value="peserta">`;
+            } else if (['pengajar','widyaiswara','coach','mentor','penguji'].includes(type)) {
+                const roleMap2 = { widyaiswara: 'Widyaiswara', coach: 'Coach', mentor: 'Mentor', penguji: 'Penguji' };
+                const fixedRole = roleMap2[type] || null;
+                title.innerText = action === 'add' ? `Tambah ${fixedRole || 'Pengajar SDM'}` : `Edit ${fixedRole || 'Pengajar SDM'}`;
+                // v2.4: pilih pegawai dari master (ID & Nama otomatis terisi, tidak perlu mengetik)
+                html += `
+                    <div><label class="block text-xs font-bold uppercase text-gray-600 mb-1">Pilih Pegawai (dari Master) <span class="text-red-500">*</span></label>
+                        <select name="id" required onchange="fillNamaPegawai(this)" class="w-full px-3 py-2 border rounded-xl text-sm bg-blue-50/50">
+                            <option value="">-- Pilih Pegawai dari Master --</option>
+                            ${renderPegawaiOptions(item.id || '', item.nama || '')}
+                        </select>
+                        <p class="text-[11px] text-gray-400 mt-1"><i class="fa-solid fa-circle-info mr-1"></i>Pilih dari master pegawai. Jika belum ada, tambahkan dulu di menu <strong>Master Pegawai</strong>.</p>
+                    </div>
+                    <div><label class="block text-xs font-bold uppercase text-gray-600 mb-1">Nama Lengkap & Gelar</label><input type="text" name="nama" id="modal-nama-pengajar" value="${item.nama || ''}" required readonly class="w-full px-3 py-2 border rounded-xl text-sm bg-gray-100"></div>`;
+                if (fixedRole) {
+                    // v2.3: menu peran spesifik -> peran fixed (hidden), tidak perlu dipilih lagi
+                    html += `<input type="hidden" name="peran" value="${fixedRole}">
+                    <div><label class="block text-xs font-bold uppercase text-gray-600 mb-1">Peran SDM</label>
+                        <div class="w-full px-3 py-2 border rounded-xl text-sm bg-purple-50 text-purple-800 font-semibold">${fixedRole}</div>
+                    </div>`;
+                } else {
+                    html += `
+                    <div><label class="block text-xs font-bold uppercase text-gray-600 mb-1">Peran SDM</label>
+                        <select name="peran" required class="w-full px-3 py-2 border rounded-xl text-sm">
+                            <option value="Widyaiswara" ${item.peran === 'Widyaiswara' ? 'selected' : ''}>Widyaiswara</option>
+                            <option value="Coach" ${item.peran === 'Coach' ? 'selected' : ''}>Coach</option>
+                            <option value="Mentor" ${item.peran === 'Mentor' ? 'selected' : ''}>Mentor</option>
+                            <option value="Penguji" ${item.peran === 'Penguji' ? 'selected' : ''}>Penguji</option>
+                        </select>
+                    </div>`;
+                }
+                html += `
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-600 mb-1">Jenis Pelatihan <span class="text-red-500">*</span></label>
+                        <select name="id_pelatihan" required class="w-full px-3 py-2 border rounded-xl text-sm bg-gray-50">
+                            <option value="SEMUA" ${!item.id_pelatihan || item.id_pelatihan === 'SEMUA' ? 'selected' : ''}>-- Berlaku Untuk SEMUA Jenis Pelatihan --</option>
+                            ${pelatihans.map(p => `<option value="${p.id}" ${item.id_pelatihan === p.id ? 'selected' : ''}>[${p.id}] ${p.nama}</option>`).join('')}
+                        </select>
+                        <p class="text-[11px] text-gray-400 mt-1">Pilih pelatihan khusus jika pengajar ini hanya mengajar di pelatihan tersebut. Pilih "SEMUA" jika mengajar di semua pelatihan.</p>
+                    </div>`;
+            } else if (type === 'kuesioner') {
+                title.innerText = action === 'add' ? 'Tambah Pertanyaan Kuesioner' : 'Edit Kuesioner';
+                html += `
+                    <div><label class="block text-xs font-bold uppercase text-gray-600 mb-1">ID Pertanyaan</label><input type="text" name="id" value="${item.id || ''}" required class="w-full px-3 py-2 border rounded-xl text-sm" placeholder="Contoh: Q-001" ${action === 'edit' ? 'readonly bg-gray-100' : ''}></div>
+                    <div><label class="block text-xs font-bold uppercase text-gray-600 mb-1">Khusus Jenis Pelatihan <span class="text-red-500">*</span></label>
+                        <select name="id_pelatihan" required class="w-full px-3 py-2 border rounded-xl text-sm bg-gray-50">
+                            <option value="SEMUA" ${item.id_pelatihan === 'SEMUA' ? 'selected' : ''}>-- Berlaku Untuk SEMUA Jenis Pelatihan --</option>
+                            ${pelatihans.map(p => `<option value="${p.id}" ${item.id_pelatihan === p.id ? 'selected' : ''}>[${p.id}] ${p.nama}</option>`).join('')}
+                        </select>
+                        <p class="text-[11px] text-gray-400 mt-1">Pilih "SEMUA" agar pertanyaan muncul di semua jenis pelatihan.</p>
+                    </div>
+                    <div><label class="block text-xs font-bold uppercase text-gray-600 mb-1">Kategori Kuesioner</label>
+                        <select name="kategori" required class="w-full px-3 py-2 border rounded-xl text-sm">
+                            <option value="Widyaiswara" ${item.kategori === 'Widyaiswara' ? 'selected' : ''}>Widyaiswara</option>
+                            <option value="Coach" ${item.kategori === 'Coach' ? 'selected' : ''}>Coach</option>
+                            <option value="Mentor" ${item.kategori === 'Mentor' ? 'selected' : ''}>Mentor</option>
+                            <option value="Penguji" ${item.kategori === 'Penguji' ? 'selected' : ''}>Penguji</option>
+                            <option value="Penyelenggara" ${item.kategori === 'Penyelenggara' ? 'selected' : ''}>Penyelenggara</option>
+                            <option value="Sarpras" ${item.kategori === 'Sarpras' ? 'selected' : ''}>Sarpras</option>
+                            <option value="LMS" ${item.kategori === 'LMS' ? 'selected' : ''}>LMS</option>
+                        </select>
+                    </div>
+                    <div><label class="block text-xs font-bold uppercase text-gray-600 mb-1">Tipe Penilaian</label>
+                        <select name="tipe" required class="w-full px-3 py-2 border rounded-xl text-sm">
+                            <option value="likert" ${item.tipe === 'likert' ? 'selected' : ''}>Skala Likert (1-5)</option>
+                            <option value="100" ${item.tipe === '100' ? 'selected' : ''}>Angka (0-100)</option>
+                            <option value="text" ${item.tipe === 'text' ? 'selected' : ''}>Teks / Catatan Uraian (Opsional)</option>
+                        </select>
+                        <p class="text-[11px] text-gray-400 mt-1">Tipe "Teks" untuk menampung catatan/saran bebas dari peserta (tidak wajib diisi).</p>
+                    </div>
+                    <div><label class="block text-xs font-bold uppercase text-gray-600 mb-1">Isi Pertanyaan</label>
+                        <textarea name="pertanyaan" required rows="3" class="w-full px-3 py-2 border rounded-xl text-sm">${item.pertanyaan || ''}</textarea>
+                    </div>`;
+            }
+
+            html += `</form>`;
+            body.innerHTML = html;
+            btn.onclick = () => saveCrudData(type);
+        }
+
+        // v2.4: render opsi pegawai dari master untuk dropdown di form pengajar
+        function renderPegawaiOptions(selectedId, selectedNama) {
+            let master = (currentAdminData && currentAdminData.master_pegawai) ? currentAdminData.master_pegawai : [];
+            let html = '';
+            let found = false;
+            master.forEach(m => {
+                if (String(m.id) === String(selectedId)) found = true;
+                html += `<option value="${m.id}" data-nama="${m.nama}" ${String(m.id)===String(selectedId)?'selected':''}>${m.id} - ${m.nama}${m.jabatan ? ' (' + m.jabatan + ')' : ''}</option>`;
+            });
+            if (selectedId && !found) {
+                html = `<option value="${selectedId}" data-nama="${selectedNama || ''}" selected>${selectedId} - ${selectedNama || ''} (tidak ada di master)</option>` + html;
+            }
+            return html;
+        }
+        function fillNamaPegawai(selectEl) {
+            const opt = selectEl.options[selectEl.selectedIndex];
+            const nama = opt ? (opt.getAttribute('data-nama') || '') : '';
+            const namaInput = document.getElementById('modal-nama-pengajar');
+            if (namaInput) namaInput.value = nama;
+        }
+
+        function closeModal() { document.getElementById('crud-modal').classList.add('hidden'); }
+
+        async function saveCrudData(type) {
+            const form = document.getElementById('crud-form');
+            if (!form.checkValidity()) { form.reportValidity(); return; }
+            const formData = new FormData(form);
+            const payload = Object.fromEntries(formData.entries());
+            payload.sheetType = (['widyaiswara','coach','mentor','penguji'].includes(type)) ? 'pengajar' : type;
+            showLoader('Menyimpan data...');
+            closeModal();
+            try {
+                const res = await callBackend('simpanDataAdmin', payload);
+                if (res && res.success) { showToast('Data berhasil disimpan!', 'success'); loadAdminMenu(type); }
+                else showToast(res.message || 'Gagal menyimpan data.', 'error');
+            } catch (err) {
+                showToast(err.message || 'Gagal menyimpan data.', 'error');
+            } finally { hideLoader(); }
+        }
+
+        async function deleteData(type, id) {
+            if (!confirm('Yakin ingin menghapus data ini secara permanen?')) return;
+            showLoader('Menghapus data...');
+            try {
+                const backendType = (['widyaiswara','coach','mentor','penguji'].includes(type)) ? 'pengajar' : type;
+                const res = await callBackend('hapusDataAdmin', { type: backendType, id: id });
+                if (res && res.success) { showToast('Data berhasil dihapus!', 'success'); loadAdminMenu(type); }
+                else showToast(res.message || 'Gagal menghapus data.', 'error');
+            } catch (err) {
+                showToast(err.message || 'Gagal menghapus data.', 'error');
+            } finally { hideLoader(); }
+        }
+    </script>
+</body>
+</html>
