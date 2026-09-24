@@ -56,8 +56,10 @@
         .spinner { border: 4px solid rgba(0, 0, 0, 0.1); width: 40px; height: 40px; border-radius: 50%; border-left-color: #2563eb; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* Mobile Bottom Nav Spacing */
+        /* Mobile Bottom Nav Spacing & Scrollbars */
         @media (max-width: 767px) { .mobile-content-pb { padding-bottom: 80px; } }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -141,6 +143,7 @@
 
         <!-- VIEW: DASHBOARD PESERTA -->
         <div id="view-peserta" class="hidden flex h-screen bg-gray-50 overflow-hidden relative">
+            <!-- Sidebar Desktop -->
             <aside class="w-72 glass-sidebar shadow-xl h-full flex-col hidden md:flex z-10">
                 <div class="p-6 border-b border-gray-200 bg-white/50">
                     <h2 class="text-xl font-bold text-gray-800 flex items-center gap-3">
@@ -172,21 +175,26 @@
             </aside>
 
             <main class="flex-1 flex flex-col h-full overflow-hidden relative w-full">
+                <!-- Header Mobile Peserta -->
                 <header class="glass-effect shadow-sm p-4 flex justify-between items-center md:hidden z-20 sticky top-0">
                     <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2"><i class="fa-solid fa-graduation-cap text-blue-600"></i> E-Evaluasi</h2>
                     <button onclick="logout()" class="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors"><i class="fa-solid fa-right-from-bracket text-lg"></i></button>
                 </header>
+                
+                <!-- Konten Utama Peserta -->
                 <div class="flex-1 overflow-y-auto p-4 md:p-8 mobile-content-pb w-full" id="peserta-content"></div>
                 
-                <!-- Mobile Bottom Nav Peserta -->
-                <div class="md:hidden fixed bottom-0 left-0 w-full glass-effect border-t border-gray-200 z-30 pb-safe">
-                    <div class="flex justify-around items-center px-1 py-2 overflow-x-auto" style="scrollbar-width: none;">
-                        <a href="#" onclick="loadPesertaMenu('beranda')" id="menu-p-mob-beranda" class="flex flex-col items-center p-2 min-w-[60px] text-blue-600 bg-blue-50 rounded-xl"><i class="fa-solid fa-house text-lg mb-1"></i><span class="text-[9px] font-medium">Home</span></a>
-                        <a href="#" onclick="loadPesertaMenu('Widyaiswara')" id="menu-p-mob-Widyaiswara" class="flex flex-col items-center p-2 min-w-[60px] text-gray-500 rounded-xl"><i class="fa-solid fa-chalkboard-user text-lg mb-1"></i><span class="text-[9px] font-medium">WI</span></a>
-                        <a href="#" onclick="loadPesertaMenu('Coach')" id="menu-p-mob-Coach" class="flex flex-col items-center p-2 min-w-[60px] text-gray-500 rounded-xl"><i class="fa-solid fa-user-tie text-lg mb-1"></i><span class="text-[9px] font-medium">Coach</span></a>
-                        <a href="#" onclick="loadPesertaMenu('Mentor')" id="menu-p-mob-Mentor" class="flex flex-col items-center p-2 min-w-[60px] text-gray-500 rounded-xl"><i class="fa-solid fa-user-graduate text-lg mb-1"></i><span class="text-[9px] font-medium">Mentor</span></a>
-                        <a href="#" onclick="loadPesertaMenu('Penguji')" id="menu-p-mob-Penguji" class="flex flex-col items-center p-2 min-w-[60px] text-gray-500 rounded-xl"><i class="fa-solid fa-clipboard-user text-lg mb-1"></i><span class="text-[9px] font-medium">Penguji</span></a>
-                        <a href="#" onclick="loadPesertaMenu('Penyelenggara')" id="menu-p-mob-Penyelenggara" class="flex flex-col items-center p-2 min-w-[60px] text-gray-500 rounded-xl"><i class="fa-solid fa-building text-lg mb-1"></i><span class="text-[9px] font-medium">Lainnya</span></a>
+                <!-- Mobile Bottom Nav Peserta (Scrollable Horizontal) -->
+                <div class="md:hidden fixed bottom-0 left-0 w-full glass-effect border-t border-gray-200 z-30 pb-safe shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+                    <div class="flex items-center gap-2 px-3 py-2 overflow-x-auto no-scrollbar scroll-smooth">
+                        <a href="#" onclick="loadPesertaMenu('beranda')" id="menu-p-mob-beranda" class="flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[64px] text-blue-600 bg-blue-50 rounded-xl"><i class="fa-solid fa-house text-lg mb-1"></i><span class="text-[9px] font-medium">Home</span></a>
+                        <a href="#" onclick="loadPesertaMenu('Widyaiswara')" id="menu-p-mob-Widyaiswara" class="flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[64px] text-gray-500 rounded-xl"><i class="fa-solid fa-chalkboard-user text-lg mb-1"></i><span class="text-[9px] font-medium">WI</span></a>
+                        <a href="#" onclick="loadPesertaMenu('Coach')" id="menu-p-mob-Coach" class="flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[64px] text-gray-500 rounded-xl"><i class="fa-solid fa-user-tie text-lg mb-1"></i><span class="text-[9px] font-medium">Coach</span></a>
+                        <a href="#" onclick="loadPesertaMenu('Mentor')" id="menu-p-mob-Mentor" class="flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[64px] text-gray-500 rounded-xl"><i class="fa-solid fa-user-graduate text-lg mb-1"></i><span class="text-[9px] font-medium">Mentor</span></a>
+                        <a href="#" onclick="loadPesertaMenu('Penguji')" id="menu-p-mob-Penguji" class="flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[64px] text-gray-500 rounded-xl"><i class="fa-solid fa-clipboard-user text-lg mb-1"></i><span class="text-[9px] font-medium">Penguji</span></a>
+                        <a href="#" onclick="loadPesertaMenu('Penyelenggara')" id="menu-p-mob-Penyelenggara" class="flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[64px] text-gray-500 rounded-xl"><i class="fa-solid fa-building text-lg mb-1"></i><span class="text-[9px] font-medium">Panitia</span></a>
+                        <a href="#" onclick="loadPesertaMenu('Sarpras')" id="menu-p-mob-Sarpras" class="flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[64px] text-gray-500 rounded-xl"><i class="fa-solid fa-building-columns text-lg mb-1"></i><span class="text-[9px] font-medium">Sarpras</span></a>
+                        <a href="#" onclick="loadPesertaMenu('LMS')" id="menu-p-mob-LMS" class="flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[64px] text-gray-500 rounded-xl"><i class="fa-solid fa-laptop-code text-lg mb-1"></i><span class="text-[9px] font-medium">LMS</span></a>
                     </div>
                 </div>
             </main>
@@ -194,6 +202,7 @@
 
         <!-- VIEW: DASHBOARD ADMIN -->
         <div id="view-admin" class="hidden flex h-screen bg-slate-50 overflow-hidden relative">
+            <!-- Sidebar Desktop Admin -->
             <aside class="w-72 bg-slate-900 text-white shadow-2xl h-full flex-col hidden md:flex z-10 border-r border-slate-800">
                 <div class="p-6 border-b border-slate-800 bg-slate-950/50">
                     <h2 class="text-xl font-bold flex items-center gap-3 text-white">
@@ -230,22 +239,30 @@
             </aside>
 
             <main class="flex-1 flex flex-col h-full overflow-hidden relative w-full bg-slate-50">
+                <!-- Header Mobile Admin -->
                 <header class="bg-slate-900 text-white shadow-sm p-4 flex justify-between items-center md:hidden z-20 sticky top-0">
                     <h2 class="text-base font-bold flex items-center gap-2"><i class="fa-solid fa-shield-halved text-blue-400"></i> Admin Panel</h2>
                     <button onclick="logout()" class="text-red-400 hover:bg-slate-800 p-2 rounded-lg transition-colors"><i class="fa-solid fa-right-from-bracket text-lg"></i></button>
                 </header>
 
+                <!-- Konten Utama Admin -->
                 <div class="flex-1 overflow-y-auto p-4 md:p-8 mobile-content-pb w-full" id="admin-content"></div>
 
-                 <!-- Mobile Bottom Navigation Admin -->
-                 <div class="md:hidden fixed bottom-0 left-0 w-full bg-slate-900 text-slate-400 border-t border-slate-800 z-30 pb-safe">
-                    <div class="flex justify-around items-center px-1 py-2 overflow-x-auto" style="scrollbar-width: none;">
-                        <a href="#" onclick="loadAdminMenu('dashboard')" id="menu-a-mob-dashboard" class="flex flex-col items-center p-2 min-w-[50px] rounded-xl text-white bg-slate-800"><i class="fa-solid fa-chart-pie text-lg mb-1"></i><span class="text-[9px] font-medium">Dash</span></a>
-                        <a href="#" onclick="loadAdminMenu('peserta')" id="menu-a-mob-peserta" class="flex flex-col items-center p-2 min-w-[50px] rounded-xl"><i class="fa-solid fa-users text-lg mb-1"></i><span class="text-[9px] font-medium">Peserta</span></a>
-                        <a href="#" onclick="loadAdminMenu('widyaiswara')" id="menu-a-mob-widyaiswara" class="flex flex-col items-center p-2 min-w-[50px] rounded-xl"><i class="fa-solid fa-chalkboard-user text-lg mb-1"></i><span class="text-[9px] font-medium">Pengajar</span></a>
-                        <a href="#" onclick="loadAdminMenu('kuesioner')" id="menu-a-mob-kuesioner" class="flex flex-col items-center p-2 min-w-[50px] rounded-xl"><i class="fa-solid fa-list-check text-lg mb-1"></i><span class="text-[9px] font-medium">Soal</span></a>
-                        <a href="#" onclick="loadAdminMenu('laporan')" id="menu-a-mob-laporan" class="flex flex-col items-center p-2 min-w-[50px] rounded-xl"><i class="fa-solid fa-file-lines text-lg mb-1"></i><span class="text-[9px] font-medium">Rekap</span></a>
-                        <a href="#" onclick="loadAdminMenu('hasil')" id="menu-a-mob-hasil" class="flex flex-col items-center p-2 min-w-[50px] rounded-xl"><i class="fa-solid fa-table-list text-lg mb-1"></i><span class="text-[9px] font-medium">Hasil</span></a>
+                 <!-- Mobile Bottom Navigation Admin (Scrollable Horizontal) -->
+                 <div class="md:hidden fixed bottom-0 left-0 w-full bg-slate-900 text-slate-400 border-t border-slate-800 z-30 pb-safe shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.5)]">
+                    <div class="flex items-center gap-2 px-3 py-2 overflow-x-auto no-scrollbar scroll-smooth">
+                        <a href="#" onclick="loadAdminMenu('dashboard')" id="menu-a-mob-dashboard" class="flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[60px] rounded-xl text-white bg-slate-800"><i class="fa-solid fa-chart-pie text-lg mb-1"></i><span class="text-[9px] font-medium">Dash</span></a>
+                        <a href="#" onclick="loadAdminMenu('master_pegawai')" id="menu-a-mob-master_pegawai" class="flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[60px] rounded-xl"><i class="fa-solid fa-id-card-clip text-lg mb-1"></i><span class="text-[9px] font-medium">Master</span></a>
+                        <a href="#" onclick="loadAdminMenu('pelatihan')" id="menu-a-mob-pelatihan" class="flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[60px] rounded-xl"><i class="fa-solid fa-calendar-days text-lg mb-1"></i><span class="text-[9px] font-medium">Diklat</span></a>
+                        <a href="#" onclick="loadAdminMenu('peserta')" id="menu-a-mob-peserta" class="flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[60px] rounded-xl"><i class="fa-solid fa-users text-lg mb-1"></i><span class="text-[9px] font-medium">Peserta</span></a>
+                        <a href="#" onclick="loadAdminMenu('widyaiswara')" id="menu-a-mob-widyaiswara" class="flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[60px] rounded-xl"><i class="fa-solid fa-chalkboard-user text-lg mb-1"></i><span class="text-[9px] font-medium">WI</span></a>
+                        <a href="#" onclick="loadAdminMenu('coach')" id="menu-a-mob-coach" class="flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[60px] rounded-xl"><i class="fa-solid fa-user-tie text-lg mb-1"></i><span class="text-[9px] font-medium">Coach</span></a>
+                        <a href="#" onclick="loadAdminMenu('mentor')" id="menu-a-mob-mentor" class="flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[60px] rounded-xl"><i class="fa-solid fa-user-graduate text-lg mb-1"></i><span class="text-[9px] font-medium">Mentor</span></a>
+                        <a href="#" onclick="loadAdminMenu('penguji')" id="menu-a-mob-penguji" class="flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[60px] rounded-xl"><i class="fa-solid fa-clipboard-user text-lg mb-1"></i><span class="text-[9px] font-medium">Penguji</span></a>
+                        <a href="#" onclick="loadAdminMenu('kuesioner')" id="menu-a-mob-kuesioner" class="flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[60px] rounded-xl"><i class="fa-solid fa-list-check text-lg mb-1"></i><span class="text-[9px] font-medium">Soal</span></a>
+                        <a href="#" onclick="loadAdminMenu('laporan')" id="menu-a-mob-laporan" class="flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[60px] rounded-xl"><i class="fa-solid fa-file-lines text-lg mb-1"></i><span class="text-[9px] font-medium">Rekap</span></a>
+                        <a href="#" onclick="loadAdminMenu('hasil')" id="menu-a-mob-hasil" class="flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[60px] rounded-xl"><i class="fa-solid fa-table-list text-lg mb-1"></i><span class="text-[9px] font-medium">Hasil</span></a>
+                        <a href="#" onclick="loadAdminMenu('analisis')" id="menu-a-mob-analisis" class="flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[60px] rounded-xl"><i class="fa-solid fa-chart-line text-lg mb-1"></i><span class="text-[9px] font-medium">Visual</span></a>
                     </div>
                 </div>
             </main>
@@ -272,7 +289,7 @@
     <!-- FIREBASE INTEGRATION -->
     <script type="module">
         // KONFIGURASI APLIKASI
-        const IS_PREVIEW = false; // Set false JIKA SUDAH TERHUBUNG KE FIREBASE
+        const IS_PREVIEW = true; // Set false JIKA SUDAH TERHUBUNG KE FIREBASE
 
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -284,13 +301,12 @@
             try {
                 // PASTE FIREBASE CONFIG ANDA DI SINI
                 const firebaseConfig = {
-  apiKey: "AIzaSyC4Tb6YTPK8gLCNRrEHV8vUfNSX196yr3A",
-  authDomain: "evaluasi-diklat-97ced.firebaseapp.com",
-  projectId: "evaluasi-diklat-97ced",
-  storageBucket: "evaluasi-diklat-97ced.firebasestorage.app",
-  messagingSenderId: "806835394274",
-  appId: "1:806835394274:web:c024245d578414f87c30bb"
-
+                  apiKey: "API_KEY_ANDA",
+                  authDomain: "PROJECT_ID.firebaseapp.com",
+                  projectId: "PROJECT_ID",
+                  storageBucket: "PROJECT_ID.appspot.com",
+                  messagingSenderId: "SENDER_ID",
+                  appId: "APP_ID"
                 };
                 window.fbApp = initializeApp(firebaseConfig);
                 window.db = getFirestore(window.fbApp);
@@ -535,7 +551,7 @@
                 const el = document.getElementById('menu-p-' + m);
                 if (el) el.className = (m === menu) ? "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold bg-blue-100 text-blue-700 border border-blue-200 transition-all" : "flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-700 transition-all font-medium";
                 const mobEl = document.getElementById('menu-p-mob-' + m);
-                if (mobEl) mobEl.className = (m === menu) ? "flex flex-col items-center p-2 min-w-[60px] rounded-xl transition-all text-blue-600 bg-blue-50" : "flex flex-col items-center p-2 min-w-[60px] text-gray-500 rounded-xl transition-all";
+                if (mobEl) mobEl.className = (m === menu) ? "flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[64px] rounded-xl transition-all text-blue-600 bg-blue-50" : "flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[64px] text-gray-500 rounded-xl transition-all";
             });
             activePesertaMenu = menu;
             const container = document.getElementById('peserta-content'); container.innerHTML = '';
@@ -677,7 +693,7 @@
             menus.forEach(m => {
                 const el = document.getElementById('menu-a-' + m), mobEl = document.getElementById('menu-a-mob-' + m);
                 if (el) el.className = (m === menu) ? "flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold bg-blue-600 text-white transition-all" : "flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-all";
-                if (mobEl) mobEl.className = (m === menu) ? "flex flex-col items-center p-2 min-w-[50px] rounded-xl text-white bg-slate-800" : "flex flex-col items-center p-2 min-w-[50px] rounded-xl";
+                if (mobEl) mobEl.className = (m === menu) ? "flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[60px] rounded-xl text-white bg-slate-800" : "flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[60px] rounded-xl";
             });
             activeAdminMenu = menu;
             const container = document.getElementById('admin-content'); container.innerHTML = '';
