@@ -289,7 +289,7 @@
     <!-- FIREBASE INTEGRATION -->
     <script type="module">
         // KONFIGURASI APLIKASI
-        const IS_PREVIEW = true; // Set false JIKA SUDAH TERHUBUNG KE FIREBASE
+        const IS_PREVIEW = false; // Set false JIKA SUDAH TERHUBUNG KE FIREBASE
 
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -301,12 +301,13 @@
             try {
                 // PASTE FIREBASE CONFIG ANDA DI SINI
                 const firebaseConfig = {
-                  apiKey: "API_KEY_ANDA",
-                  authDomain: "PROJECT_ID.firebaseapp.com",
-                  projectId: "PROJECT_ID",
-                  storageBucket: "PROJECT_ID.appspot.com",
-                  messagingSenderId: "SENDER_ID",
-                  appId: "APP_ID"
+  apiKey: "AIzaSyC4Tb6YTPK8gLCNRrEHV8vUfNSX196yr3A",
+  authDomain: "evaluasi-diklat-97ced.firebaseapp.com",
+  projectId: "evaluasi-diklat-97ced",
+  storageBucket: "evaluasi-diklat-97ced.firebasestorage.app",
+  messagingSenderId: "806835394274",
+  appId: "1:806835394274:web:c024245d578414f87c30bb"
+
                 };
                 window.fbApp = initializeApp(firebaseConfig);
                 window.db = getFirestore(window.fbApp);
