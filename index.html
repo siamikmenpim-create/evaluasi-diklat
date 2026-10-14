@@ -35,7 +35,6 @@
         const manifestURL = URL.createObjectURL(manifestBlob);
         document.write(`<link rel="manifest" href="${manifestURL}">`);
     </script>
-
     <style>
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
         
@@ -66,6 +65,8 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        /* Chart Canvas Background Fix for PDF */
+        canvas { background-color: white !important; }
     </style>
 </head>
 <body>
@@ -77,7 +78,6 @@
                 <p class="text-gray-800 font-semibold text-sm" id="loader-text">Memproses data...</p>
             </div>
         </div>
-
         <!-- NOTIFICATION TOAST (Top Right) -->
         <div id="toast" class="fixed top-5 right-5 z-[100001] transform transition-all duration-300 translate-x-[150%] flex items-center p-4 rounded-xl shadow-2xl text-white font-medium max-w-md cursor-pointer select-none" onclick="hideToast()">
             <span id="toast-icon" class="mr-3 text-2xl"></span>
@@ -86,7 +86,6 @@
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
-
         <!-- VIEW: LOGIN -->
         <div id="view-login" class="min-h-screen flex items-center justify-center p-4 bg-[url('https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1920&auto=format&fit=crop')] bg-cover bg-center">
             <div class="absolute inset-0 bg-white/60 backdrop-blur-sm"></div>
@@ -104,7 +103,6 @@
                         <button onclick="switchLoginTab('peserta')" id="tab-peserta" class="w-1/2 py-2 text-center font-semibold text-blue-700 bg-white rounded-lg shadow-sm text-sm transition-all">Peserta</button>
                         <button onclick="switchLoginTab('admin')" id="tab-admin" class="w-1/2 py-2 text-center font-medium text-gray-500 hover:text-gray-700 rounded-lg text-sm transition-all">Admin</button>
                     </div>
-
                     <form id="form-login-peserta" onsubmit="handleLogin(event, 'peserta')">
                         <div class="mb-6">
                             <label class="block text-gray-700 text-xs font-bold uppercase tracking-wider mb-2">NIP / ID Peserta</label>
@@ -117,7 +115,6 @@
                             <span>Masuk Kuesioner</span><i class="fa-solid fa-arrow-right text-xs"></i>
                         </button>
                     </form>
-
                     <form id="form-login-admin" onsubmit="handleLogin(event, 'admin')" class="hidden">
                         <div class="mb-4">
                             <label class="block text-gray-700 text-xs font-bold uppercase tracking-wider mb-2">Email Admin</label>
@@ -140,7 +137,6 @@
                 </div>
             </div>
         </div>
-
         <!-- VIEW: DASHBOARD PESERTA -->
         <div id="view-peserta" class="hidden flex h-screen bg-gray-50 overflow-hidden relative">
             <!-- Sidebar Desktop -->
@@ -159,13 +155,7 @@
                     <a href="#" onclick="loadPesertaMenu('beranda')" id="menu-p-beranda" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-blue-700 bg-blue-50 border border-blue-100"><i class="fa-solid fa-house w-5 text-center"></i> Beranda</a>
                     
                     <div class="px-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 mt-6">Kuesioner Evaluasi</div>
-                    <a href="#" onclick="loadPesertaMenu('Widyaiswara')" id="menu-p-Widyaiswara" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-gray-600 hover:bg-blue-50/80 hover:text-blue-700 transition-all"><i class="fa-solid fa-chalkboard-user w-5 text-center text-indigo-400"></i> Widyaiswara</a>
-                    <a href="#" onclick="loadPesertaMenu('Coach')" id="menu-p-Coach" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-gray-600 hover:bg-blue-50/80 hover:text-blue-700 transition-all"><i class="fa-solid fa-user-tie w-5 text-center text-sky-400"></i> Coach</a>
-                    <a href="#" onclick="loadPesertaMenu('Mentor')" id="menu-p-Mentor" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-gray-600 hover:bg-blue-50/80 hover:text-blue-700 transition-all"><i class="fa-solid fa-user-graduate w-5 text-center text-teal-400"></i> Mentor</a>
-                    <a href="#" onclick="loadPesertaMenu('Penguji')" id="menu-p-Penguji" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-gray-600 hover:bg-blue-50/80 hover:text-blue-700 transition-all"><i class="fa-solid fa-clipboard-user w-5 text-center text-rose-400"></i> Penguji</a>
-                    <a href="#" onclick="loadPesertaMenu('Penyelenggara')" id="menu-p-Penyelenggara" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-gray-600 hover:bg-blue-50/80 hover:text-blue-700 transition-all"><i class="fa-solid fa-building w-5 text-center text-amber-400"></i> Penyelenggara</a>
-                    <a href="#" onclick="loadPesertaMenu('Sarpras')" id="menu-p-Sarpras" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-gray-600 hover:bg-blue-50/80 hover:text-blue-700 transition-all"><i class="fa-solid fa-building-columns w-5 text-center text-orange-400"></i> Sarpras</a>
-                    <a href="#" onclick="loadPesertaMenu('LMS')" id="menu-p-LMS" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-gray-600 hover:bg-blue-50/80 hover:text-blue-700 transition-all"><i class="fa-solid fa-laptop-code w-5 text-center text-purple-400"></i> LMS</a>
+                    <div id="peserta-dynamic-sidebar"></div>
                 </nav>
                 <div class="p-4 border-t border-gray-200">
                     <button onclick="logout()" class="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition-all font-bold border border-red-100">
@@ -173,7 +163,6 @@
                     </button>
                 </div>
             </aside>
-
             <main class="flex-1 flex flex-col h-full overflow-hidden relative w-full">
                 <!-- Header Mobile Peserta -->
                 <header class="glass-effect shadow-sm p-4 flex justify-between items-center md:hidden z-20 sticky top-0">
@@ -186,20 +175,12 @@
                 
                 <!-- Mobile Bottom Nav Peserta (Scrollable Horizontal) -->
                 <div class="md:hidden fixed bottom-0 left-0 w-full glass-effect border-t border-gray-200 z-30 pb-safe shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-                    <div class="flex items-center gap-2 px-3 py-2 overflow-x-auto no-scrollbar scroll-smooth">
+                    <div class="flex items-center gap-2 px-3 py-2 overflow-x-auto no-scrollbar scroll-smooth" id="peserta-dynamic-mobile">
                         <a href="#" onclick="loadPesertaMenu('beranda')" id="menu-p-mob-beranda" class="flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[64px] text-blue-600 bg-blue-50 rounded-xl"><i class="fa-solid fa-house text-lg mb-1"></i><span class="text-[9px] font-medium">Home</span></a>
-                        <a href="#" onclick="loadPesertaMenu('Widyaiswara')" id="menu-p-mob-Widyaiswara" class="flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[64px] text-gray-500 rounded-xl"><i class="fa-solid fa-chalkboard-user text-lg mb-1"></i><span class="text-[9px] font-medium">WI</span></a>
-                        <a href="#" onclick="loadPesertaMenu('Coach')" id="menu-p-mob-Coach" class="flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[64px] text-gray-500 rounded-xl"><i class="fa-solid fa-user-tie text-lg mb-1"></i><span class="text-[9px] font-medium">Coach</span></a>
-                        <a href="#" onclick="loadPesertaMenu('Mentor')" id="menu-p-mob-Mentor" class="flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[64px] text-gray-500 rounded-xl"><i class="fa-solid fa-user-graduate text-lg mb-1"></i><span class="text-[9px] font-medium">Mentor</span></a>
-                        <a href="#" onclick="loadPesertaMenu('Penguji')" id="menu-p-mob-Penguji" class="flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[64px] text-gray-500 rounded-xl"><i class="fa-solid fa-clipboard-user text-lg mb-1"></i><span class="text-[9px] font-medium">Penguji</span></a>
-                        <a href="#" onclick="loadPesertaMenu('Penyelenggara')" id="menu-p-mob-Penyelenggara" class="flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[64px] text-gray-500 rounded-xl"><i class="fa-solid fa-building text-lg mb-1"></i><span class="text-[9px] font-medium">Panitia</span></a>
-                        <a href="#" onclick="loadPesertaMenu('Sarpras')" id="menu-p-mob-Sarpras" class="flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[64px] text-gray-500 rounded-xl"><i class="fa-solid fa-building-columns text-lg mb-1"></i><span class="text-[9px] font-medium">Sarpras</span></a>
-                        <a href="#" onclick="loadPesertaMenu('LMS')" id="menu-p-mob-LMS" class="flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[64px] text-gray-500 rounded-xl"><i class="fa-solid fa-laptop-code text-lg mb-1"></i><span class="text-[9px] font-medium">LMS</span></a>
                     </div>
                 </div>
             </main>
         </div>
-
         <!-- VIEW: DASHBOARD ADMIN -->
         <div id="view-admin" class="hidden flex h-screen bg-slate-50 overflow-hidden relative">
             <!-- Sidebar Desktop Admin -->
@@ -215,6 +196,7 @@
                     <a href="#" onclick="loadAdminMenu('dashboard')" id="menu-a-dashboard" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold bg-blue-600 text-white transition-all"><i class="fa-solid fa-chart-pie w-5 text-center text-blue-400"></i> Ringkasan</a>
                     
                     <div class="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 mt-6">Data Master</div>
+                    <a href="#" onclick="loadAdminMenu('kategori_evaluasi')" id="menu-a-kategori_evaluasi" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-all"><i class="fa-solid fa-layer-group w-5 text-center text-violet-400"></i> Kategori Evaluasi</a>
                     <a href="#" onclick="loadAdminMenu('master_pegawai')" id="menu-a-master_pegawai" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-all"><i class="fa-solid fa-id-card-clip w-5 text-center text-indigo-400"></i> Master Pegawai</a>
                     <a href="#" onclick="loadAdminMenu('pelatihan')" id="menu-a-pelatihan" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-all"><i class="fa-solid fa-calendar-days w-5 text-center text-sky-400"></i> Pelatihan</a>
                     <a href="#" onclick="loadAdminMenu('peserta')" id="menu-a-peserta" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-all"><i class="fa-solid fa-users w-5 text-center text-teal-400"></i> Peserta Login</a>
@@ -230,6 +212,7 @@
                     <a href="#" onclick="loadAdminMenu('hasil')" id="menu-a-hasil" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-all"><i class="fa-solid fa-table-list w-5 text-center text-pink-400"></i> Hasil Evaluasi</a>
                     <a href="#" onclick="loadAdminMenu('laporan')" id="menu-a-laporan" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-all"><i class="fa-solid fa-file-lines w-5 text-center text-yellow-400"></i> Laporan Rekap</a>
                     <a href="#" onclick="loadAdminMenu('analisis')" id="menu-a-analisis" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-all"><i class="fa-solid fa-chart-line w-5 text-center text-cyan-400"></i> Analisis Data</a>
+                    <a href="#" onclick="loadAdminMenu('monitoring')" id="menu-a-monitoring" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-all"><i class="fa-solid fa-bars-progress w-5 text-center text-emerald-400"></i> Monitoring</a>
                 </nav>
                 <div class="p-4 border-t border-slate-800 bg-slate-950/50">
                     <button onclick="logout()" class="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm text-red-400 bg-slate-800/50 hover:bg-red-500 hover:text-white rounded-xl transition-all font-bold">
@@ -237,21 +220,19 @@
                     </button>
                 </div>
             </aside>
-
             <main class="flex-1 flex flex-col h-full overflow-hidden relative w-full bg-slate-50">
                 <!-- Header Mobile Admin -->
                 <header class="bg-slate-900 text-white shadow-sm p-4 flex justify-between items-center md:hidden z-20 sticky top-0">
                     <h2 class="text-base font-bold flex items-center gap-2"><i class="fa-solid fa-shield-halved text-blue-400"></i> Admin Panel</h2>
                     <button onclick="logout()" class="text-red-400 hover:bg-slate-800 p-2 rounded-lg transition-colors"><i class="fa-solid fa-right-from-bracket text-lg"></i></button>
                 </header>
-
                 <!-- Konten Utama Admin -->
                 <div class="flex-1 overflow-y-auto p-4 md:p-8 mobile-content-pb w-full" id="admin-content"></div>
-
                  <!-- Mobile Bottom Navigation Admin (Scrollable Horizontal) -->
                  <div class="md:hidden fixed bottom-0 left-0 w-full bg-slate-900 text-slate-400 border-t border-slate-800 z-30 pb-safe shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.5)]">
                     <div class="flex items-center gap-2 px-3 py-2 overflow-x-auto no-scrollbar scroll-smooth">
                         <a href="#" onclick="loadAdminMenu('dashboard')" id="menu-a-mob-dashboard" class="flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[60px] rounded-xl text-white bg-slate-800"><i class="fa-solid fa-chart-pie text-lg mb-1"></i><span class="text-[9px] font-medium">Dash</span></a>
+                        <a href="#" onclick="loadAdminMenu('kategori_evaluasi')" id="menu-a-mob-kategori_evaluasi" class="flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[60px] rounded-xl"><i class="fa-solid fa-layer-group text-lg mb-1"></i><span class="text-[9px] font-medium">Kategori</span></a>
                         <a href="#" onclick="loadAdminMenu('master_pegawai')" id="menu-a-mob-master_pegawai" class="flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[60px] rounded-xl"><i class="fa-solid fa-id-card-clip text-lg mb-1"></i><span class="text-[9px] font-medium">Master</span></a>
                         <a href="#" onclick="loadAdminMenu('pelatihan')" id="menu-a-mob-pelatihan" class="flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[60px] rounded-xl"><i class="fa-solid fa-calendar-days text-lg mb-1"></i><span class="text-[9px] font-medium">Diklat</span></a>
                         <a href="#" onclick="loadAdminMenu('peserta')" id="menu-a-mob-peserta" class="flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[60px] rounded-xl"><i class="fa-solid fa-users text-lg mb-1"></i><span class="text-[9px] font-medium">Peserta</span></a>
@@ -263,11 +244,11 @@
                         <a href="#" onclick="loadAdminMenu('laporan')" id="menu-a-mob-laporan" class="flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[60px] rounded-xl"><i class="fa-solid fa-file-lines text-lg mb-1"></i><span class="text-[9px] font-medium">Rekap</span></a>
                         <a href="#" onclick="loadAdminMenu('hasil')" id="menu-a-mob-hasil" class="flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[60px] rounded-xl"><i class="fa-solid fa-table-list text-lg mb-1"></i><span class="text-[9px] font-medium">Hasil</span></a>
                         <a href="#" onclick="loadAdminMenu('analisis')" id="menu-a-mob-analisis" class="flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[60px] rounded-xl"><i class="fa-solid fa-chart-line text-lg mb-1"></i><span class="text-[9px] font-medium">Visual</span></a>
+                        <a href="#" onclick="loadAdminMenu('monitoring')" id="menu-a-mob-monitoring" class="flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[60px] rounded-xl"><i class="fa-solid fa-bars-progress text-lg mb-1"></i><span class="text-[9px] font-medium">Monitor</span></a>
                     </div>
                 </div>
             </main>
         </div>
-
         <!-- MODAL CRUD ADMIN -->
         <div id="crud-modal" class="fixed inset-0 bg-slate-900/60 z-[50000] hidden flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
@@ -284,30 +265,37 @@
                 </div>
             </div>
         </div>
+        <!-- CONFIRM MODAL CUSTOM -->
+        <div id="confirm-modal" class="fixed inset-0 bg-slate-900/60 z-[60000] hidden flex items-center justify-center p-4 backdrop-blur-sm">
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden flex flex-col text-center p-6">
+                <div class="w-16 h-16 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-4"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2" id="confirm-title">Konfirmasi Hapus</h3>
+                <p class="text-sm text-gray-500 mb-6" id="confirm-msg">Apakah Anda yakin ingin menghapus data ini?</p>
+                <div class="flex justify-center gap-3">
+                    <button type="button" onclick="closeConfirmModal()" class="px-5 py-2.5 text-sm font-semibold text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors w-1/2">Batal</button>
+                    <button type="button" id="confirm-yes-btn" class="px-5 py-2.5 text-sm font-bold text-white bg-rose-600 rounded-xl hover:bg-rose-700 transition-all w-1/2 shadow-md">Ya, Hapus</button>
+                </div>
+            </div>
+        </div>
     </div>
-
     <!-- FIREBASE INTEGRATION -->
     <script type="module">
-        // KONFIGURASI APLIKASI
         const IS_PREVIEW = false; // Set false JIKA SUDAH TERHUBUNG KE FIREBASE
-
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, getDocs, setDoc, addDoc, updateDoc, deleteDoc, collection, query, where, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
         window.db = null; window.auth = null; window.fbApp = null; window.firebaseError = null;
-
         if (!IS_PREVIEW) {
             try {
                 // PASTE FIREBASE CONFIG ANDA DI SINI
                 const firebaseConfig = {
-  apiKey: "AIzaSyC4Tb6YTPK8gLCNRrEHV8vUfNSX196yr3A",
-  authDomain: "evaluasi-diklat-97ced.firebaseapp.com",
-  projectId: "evaluasi-diklat-97ced",
-  storageBucket: "evaluasi-diklat-97ced.firebasestorage.app",
-  messagingSenderId: "806835394274",
-  appId: "1:806835394274:web:c024245d578414f87c30bb"
-
+                    apiKey: "AIzaSyC4Tb6YTPK8gLCNRrEHV8vUfNSX196yr3A",
+                    authDomain: "evaluasi-diklat-97ced.firebaseapp.com",
+                    databaseURL: "https://evaluasi-diklat-97ced-default-rtdb.asia-southeast1.firebasedatabase.app",
+                    projectId: "evaluasi-diklat-97ced",
+                    storageBucket: "evaluasi-diklat-97ced.firebasestorage.app",
+                    messagingSenderId: "806835394274",
+                    appId: "1:806835394274:web:c024245d578414f87c30bb"
                 };
                 window.fbApp = initializeApp(firebaseConfig);
                 window.db = getFirestore(window.fbApp);
@@ -317,13 +305,12 @@
                 window.firebaseError = e.message;
             }
         }
-
         window.fbSignInWithEmailAndPassword = signInWithEmailAndPassword;
         window.fbSignOut = signOut;
         window.fbDoc = doc; window.fbGetDoc = getDoc; window.fbGetDocs = getDocs;
         window.fbSetDoc = setDoc; window.fbAddDoc = addDoc; window.fbUpdateDoc = updateDoc; window.fbDeleteDoc = deleteDoc;
         window.fbCollection = collection; window.fbQuery = query; window.fbWhere = where; window.fbWriteBatch = writeBatch;
-
+        
         // Auto Setup Database
         window.autoSetupDatabase = async function() {
             if (IS_PREVIEW || !window.db) return { success: false, message: "Preview mode or DB not ready" };
@@ -340,13 +327,21 @@
                         { id: '198807072015011004', nama: 'Indra Hermawan', jabatan: 'Mentor' }
                     ];
                     masterPegawaiData.forEach(item => batch.set(doc(window.db, 'master_pegawai', item.id), item));
-
+                    const kategoriData = [
+                        { id: 'Widyaiswara', nama: 'Widyaiswara', tipe: 'SDM', icon: 'fa-chalkboard-user' },
+                        { id: 'Coach', nama: 'Coach', tipe: 'SDM', icon: 'fa-user-tie' },
+                        { id: 'Mentor', nama: 'Mentor', tipe: 'SDM', icon: 'fa-user-graduate' },
+                        { id: 'Penguji', nama: 'Penguji', tipe: 'SDM', icon: 'fa-clipboard-user' },
+                        { id: 'Penyelenggara', nama: 'Penyelenggara', tipe: 'Fasilitas', icon: 'fa-building' },
+                        { id: 'Sarpras', nama: 'Sarpras', tipe: 'Fasilitas', icon: 'fa-building-columns' },
+                        { id: 'LMS', nama: 'LMS', tipe: 'Fasilitas', icon: 'fa-laptop-code' }
+                    ];
+                    kategoriData.forEach(item => batch.set(doc(window.db, 'kategori_evaluasi', item.id), item));
                     const pelatihanData = [
-                        { id: 'P1', nama: 'Pelatihan Administrator (PKA)', tgl_mulai: '2026-10-01', tgl_selesai: '2026-12-01' },
-                        { id: 'P2', nama: 'Pelatihan Pengawas (PKP)', tgl_mulai: '2026-11-01', tgl_selesai: '2026-12-15' }
+                        { id: 'P1', nama: 'Pelatihan Administrator (PKA)', tgl_mulai: '2026-10-01', tgl_selesai: '2026-12-01', evaluasi_aktif: ['Widyaiswara','Coach','Mentor','Penguji','Penyelenggara','Sarpras','LMS'] },
+                        { id: 'P2', nama: 'Pelatihan Pengawas (PKP)', tgl_mulai: '2026-11-01', tgl_selesai: '2026-12-15', evaluasi_aktif: ['Widyaiswara','Coach','Mentor','Penguji','Penyelenggara','Sarpras','LMS'] }
                     ];
                     pelatihanData.forEach(item => batch.set(doc(window.db, 'pelatihan', item.id), item));
-
                     const pengajarData = [
                         { id: '198001012005011001', nama: 'Dr. Ahmad Subarjo, M.Si', peran: 'Widyaiswara', id_pelatihan: 'P1' },
                         { id: '198205052010012002', nama: 'Siti Aminah, S.E., M.M.', peran: 'Coach', id_pelatihan: 'P1' },
@@ -357,7 +352,6 @@
                         let docId = `${item.id}_${item.peran}_${item.id_pelatihan}`.replace(/[^a-zA-Z0-9_]/g, '');
                         batch.set(doc(window.db, 'pengajar', docId), { ...item, doc_id: docId });
                     });
-
                     const kuesionerData = [
                         { id: 'Q1', id_pelatihan: 'P1', kategori: 'Widyaiswara', tipe: 'likert', pertanyaan: '[PKA] Materi disampaikan dengan jelas.' },
                         { id: 'Q2', id_pelatihan: 'P1', kategori: 'Widyaiswara', tipe: '100', pertanyaan: '[PKA] Nilai penguasaan materi (0-100)' },
@@ -368,13 +362,11 @@
                         { id: 'Q7', id_pelatihan: 'SEMUA', kategori: 'Penyelenggara', tipe: 'text', pertanyaan: 'Tuliskan saran Anda.' }
                     ];
                     kuesionerData.forEach(item => batch.set(doc(window.db, 'kuesioner', item.id), item));
-
                     const pesertaData = [
                         { nip: '123456789', nama: 'Budi Santoso', role: 'peserta', id_pelatihan: 'P1' },
                         { nip: '987654321', nama: 'Siti Aminah', role: 'peserta', id_pelatihan: 'P2' }
                     ];
                     pesertaData.forEach(item => batch.set(doc(window.db, 'users', item.nip), item));
-
                     await batch.commit();
                     return { success: true, message: "Database dummy disiapkan." };
                 }
@@ -383,16 +375,15 @@
         };
         window.dispatchEvent(new Event('firebaseModuleReady'));
     </script>
-
     <!-- MAIN JAVASCRIPT LOGIC -->
     <script>
-        // --- State Variables ---
         let currentUser = null;
         let activeAdminMenu = 'dashboard';
         let activePesertaMenu = 'beranda';
         let currentAdminData = null;
         let currentPesertaFormData = null;
         let toastTimeout = null;
+        let currentLaporanStats = null; 
         
         // --- Filter & Sort States ---
         window.kuesionerState = { filterPel: 'ALL', filterKat: 'ALL', sortCol: 'id', sortAsc: true };
@@ -404,8 +395,8 @@
                 { nip: '987654321', nama: 'Siti Aminah', role: 'peserta', id_pelatihan: 'P2' }
             ],
             pelatihan: [
-                { id: 'P1', nama: 'Pelatihan Administrator (PKA)', tgl_mulai: '2026-10-01', tgl_selesai: '2026-12-01' },
-                { id: 'P2', nama: 'Pelatihan Pengawas (PKP)', tgl_mulai: '2026-11-01', tgl_selesai: '2026-12-15' }
+                { id: 'P1', nama: 'Pelatihan Administrator (PKA)', tgl_mulai: '2026-10-01', tgl_selesai: '2026-12-01', evaluasi_aktif: ['Widyaiswara','Coach','Mentor','Penguji','Penyelenggara','Sarpras','LMS'] },
+                { id: 'P2', nama: 'Pelatihan Pengawas (PKP)', tgl_mulai: '2026-11-01', tgl_selesai: '2026-12-15', evaluasi_aktif: ['Widyaiswara','Coach','Mentor','Penguji','Penyelenggara','Sarpras','LMS'] }
             ],
             pengajar: [
                 { id: '198001012005011001', nama: 'Dr. Ahmad Subarjo, M.Si', peran: 'Widyaiswara', id_pelatihan: 'P1', doc_id: '198001012005011001_Widyaiswara_P1' },
@@ -418,6 +409,15 @@
                 { id: '198205052010012002', nama: 'Siti Aminah, S.E., M.M.', jabatan: 'Coach PKP' },
                 { id: '198503032012031003', nama: 'Bambang Pamungkas', jabatan: 'Penguji' },
                 { id: '198807072015011004', nama: 'Indra Hermawan', jabatan: 'Mentor' }
+            ],
+            kategori_evaluasi: [
+                { id: 'Widyaiswara', nama: 'Widyaiswara', tipe: 'SDM', icon: 'fa-chalkboard-user' },
+                { id: 'Coach', nama: 'Coach', tipe: 'SDM', icon: 'fa-user-tie' },
+                { id: 'Mentor', nama: 'Mentor', tipe: 'SDM', icon: 'fa-user-graduate' },
+                { id: 'Penguji', nama: 'Penguji', tipe: 'SDM', icon: 'fa-clipboard-user' },
+                { id: 'Penyelenggara', nama: 'Penyelenggara', tipe: 'Fasilitas', icon: 'fa-building' },
+                { id: 'Sarpras', nama: 'Sarpras', tipe: 'Fasilitas', icon: 'fa-building-columns' },
+                { id: 'LMS', nama: 'LMS', tipe: 'Fasilitas', icon: 'fa-laptop-code' }
             ],
             kuesioner: [
                 { id: 'Q1', id_pelatihan: 'P1', kategori: 'Widyaiswara', tipe: 'likert', pertanyaan: '[PKA] Materi disampaikan dengan jelas.' },
@@ -434,7 +434,6 @@
                 { id_jawaban: 'H-3', tanggal: '2026-10-03', nip: '987654321', id_pelatihan: 'P2', kategori: 'Sarpras', target_id: '-', id_pertanyaan: 'Q5', nilai: '4' }
             ]
         };
-
         // --- Initialization ---
         document.addEventListener('DOMContentLoaded', () => {
             if (!window.IS_PREVIEW) {
@@ -455,7 +454,6 @@
                 document.querySelector('#form-login-admin').after(previewInfo);
             }
         });
-
         // --- UI Helpers ---
         function showLoader(text = 'Memproses...') { document.getElementById('loader-text').innerText = text; document.getElementById('loader').classList.remove('hidden'); }
         function hideLoader() { document.getElementById('loader').classList.add('hidden'); }
@@ -474,13 +472,11 @@
             toast.classList.remove('translate-x-[150%]'); // Show
             toastTimeout = setTimeout(() => { hideToast(); }, 2000); // 2 Seconds
         }
-
         function hideToast() {
             const toast = document.getElementById('toast');
             if (toast) toast.classList.add('translate-x-[150%]');
         }
-
-        // --- STREAMING_CHUNK: Authentication Logic ---
+        // --- Authentication Logic ---
         function switchLoginTab(type) {
             const fp = document.getElementById('form-login-peserta'), fa = document.getElementById('form-login-admin');
             const tp = document.getElementById('tab-peserta'), ta = document.getElementById('tab-admin');
@@ -494,7 +490,6 @@
                 tp.className = "w-1/2 py-2 text-center font-medium text-gray-500 hover:text-gray-700 rounded-lg text-sm transition-all";
             }
         }
-
         async function handleLogin(e, type) {
             e.preventDefault(); showLoader('Memverifikasi...');
             try {
@@ -503,7 +498,13 @@
                     if (type === 'peserta') {
                         const nip = document.getElementById('nip').value.trim();
                         const found = dbDummy.users.find(u => u.nip === nip);
-                        if (found) { currentUser = { ...found }; setupPesertaView(); } 
+                        if (found) { 
+                            currentUser = { ...found }; 
+                            let pelData = dbDummy.pelatihan.find(p => p.id === currentUser.id_pelatihan);
+                            currentUser.active_menus = pelData && pelData.evaluasi_aktif ? pelData.evaluasi_aktif : ['Widyaiswara', 'Coach', 'Mentor', 'Penguji', 'Penyelenggara', 'Sarpras', 'LMS'];
+                            window.kategoriMaster = dbDummy.kategori_evaluasi;
+                            setupPesertaView(); 
+                        } 
                         else throw new Error("NIP tidak ditemukan.");
                     } else {
                         currentUser = { nip: 'admin', nama: 'Admin', role: 'admin' }; setupAdminView();
@@ -513,7 +514,17 @@
                         const nip = document.getElementById('nip').value.trim();
                         const userSnap = await window.fbGetDoc(window.fbDoc(window.db, "users", nip));
                         if (userSnap.exists() && userSnap.data().role === 'peserta') {
-                            currentUser = { nip: nip, ...userSnap.data() }; setupPesertaView();
+                            currentUser = { nip: nip, ...userSnap.data() }; 
+                            let pSnap = await window.fbGetDoc(window.fbDoc(window.db, "pelatihan", currentUser.id_pelatihan));
+                            let pelData = pSnap.exists() ? pSnap.data() : null;
+                            currentUser.active_menus = pelData && pelData.evaluasi_aktif ? pelData.evaluasi_aktif : ['Widyaiswara', 'Coach', 'Mentor', 'Penguji', 'Penyelenggara', 'Sarpras', 'LMS'];
+                            
+                            // Fetch Kategori Master untuk Render Dinamis
+                            window.kategoriMaster = [];
+                            const katSnap = await window.fbGetDocs(window.fbCollection(window.db, "kategori_evaluasi"));
+                            katSnap.forEach(d => window.kategoriMaster.push(d.data()));
+                            
+                            setupPesertaView();
                         } else throw new Error("NIP tidak terdaftar.");
                     } else {
                         const email = document.getElementById('email').value.trim(), password = document.getElementById('password').value.trim();
@@ -521,21 +532,41 @@
                         currentUser = { uid: cred.user.uid, role: 'admin', nama: 'Admin' }; setupAdminView();
                     }
                 }
-            } catch (err) { showToast(err.message, 'error'); } 
+            } catch (err) { 
+                if (err.message.includes("Missing or insufficient permissions") || err.code === 'permission-denied') {
+                    showToast("Database Firebase terkunci (Cek Rules Firestore)", 'error');
+                } else {
+                    showToast(err.message, 'error'); 
+                }
+            } 
             finally { hideLoader(); }
         }
-
         function setupPesertaView() {
             document.getElementById('view-login').classList.add('hidden'); document.getElementById('view-peserta').classList.remove('hidden');
             document.getElementById('peserta-name-display').innerText = currentUser.nama; document.getElementById('peserta-nip-display').innerText = currentUser.nip;
+            
+            // Build Dynamic Menus based on active_menus and kategoriMaster
+            const sidebarContainer = document.getElementById('peserta-dynamic-sidebar');
+            const mobileContainer = document.getElementById('peserta-dynamic-mobile');
+            
+            let sidebarHTML = '';
+            let mobileHTML = `<a href="#" onclick="loadPesertaMenu('beranda')" id="menu-p-mob-beranda" class="flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[64px] text-blue-600 bg-blue-50 rounded-xl"><i class="fa-solid fa-house text-lg mb-1"></i><span class="text-[9px] font-medium">Home</span></a>`;
+            
+            (currentUser.active_menus || []).forEach(catId => {
+                let catData = (window.kategoriMaster || []).find(k => k.id === catId) || { id: catId, nama: catId, icon: 'fa-file-lines' };
+                sidebarHTML += `<a href="#" onclick="loadPesertaMenu('${catData.id}')" id="menu-p-${catData.id}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-gray-600 hover:bg-blue-50/80 hover:text-blue-700 transition-all"><i class="fa-solid ${catData.icon} w-5 text-center text-blue-400"></i> ${catData.nama}</a>`;
+                mobileHTML += `<a href="#" onclick="loadPesertaMenu('${catData.id}')" id="menu-p-mob-${catData.id}" class="flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[64px] text-gray-500 rounded-xl"><i class="fa-solid ${catData.icon} text-lg mb-1"></i><span class="text-[9px] font-medium">${catData.nama.substring(0, 8)}</span></a>`;
+            });
+            
+            if (sidebarContainer) sidebarContainer.innerHTML = sidebarHTML;
+            if (mobileContainer) mobileContainer.innerHTML = mobileHTML;
+
             hideToast(); loadPesertaMenu('beranda');
         }
-
         function setupAdminView() {
             document.getElementById('view-login').classList.add('hidden'); document.getElementById('view-admin').classList.remove('hidden');
             hideToast(); loadAdminMenu('dashboard');
         }
-
         async function logout() {
             if (!window.IS_PREVIEW && window.auth && currentUser?.role === 'admin') { try { await window.fbSignOut(window.auth); } catch(e){} }
             currentUser = null;
@@ -544,13 +575,17 @@
             ['nip','email','password'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).value = ''; });
             hideToast();
         }
-
-        // --- STREAMING_CHUNK: Participant (Peserta) Logic ---
+        // --- STREAMING_CHUNK: Implementing participant menu rendering and evaluation forms... ---
         function loadPesertaMenu(menu) {
-            const menus = ['beranda', 'Widyaiswara', 'Coach', 'Mentor', 'Penguji', 'Penyelenggara', 'Sarpras', 'LMS'];
-            menus.forEach(m => {
+            // Reset Beranda manually
+            const hb = document.getElementById('menu-p-beranda'), hbm = document.getElementById('menu-p-mob-beranda');
+            if(hb) hb.className = (menu === 'beranda') ? "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold bg-blue-100 text-blue-700 border border-blue-200 transition-all" : "flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-700 transition-all font-medium";
+            if(hbm) hbm.className = (menu === 'beranda') ? "flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[64px] rounded-xl transition-all text-blue-600 bg-blue-50" : "flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[64px] text-gray-500 rounded-xl transition-all";
+            
+            // Loop array dinamis untuk mereset class active
+            (currentUser.active_menus || []).forEach(m => {
                 const el = document.getElementById('menu-p-' + m);
-                if (el) el.className = (m === menu) ? "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold bg-blue-100 text-blue-700 border border-blue-200 transition-all" : "flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-700 transition-all font-medium";
+                if (el) el.className = (m === menu) ? "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold bg-blue-100 text-blue-700 border border-blue-200 transition-all" : "flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-gray-600 hover:bg-blue-50/80 hover:text-blue-700 transition-all";
                 const mobEl = document.getElementById('menu-p-mob-' + m);
                 if (mobEl) mobEl.className = (m === menu) ? "flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[64px] rounded-xl transition-all text-blue-600 bg-blue-50" : "flex-shrink-0 flex flex-col items-center justify-center p-2 min-w-[64px] text-gray-500 rounded-xl transition-all";
             });
@@ -559,22 +594,25 @@
             if (menu === 'beranda') renderPesertaBeranda(container);
             else renderFormEvaluasi(menu, container);
         }
-
         function renderPesertaBeranda(container) {
             let html = `
                 <div class="mb-8"><h1 class="text-2xl font-bold text-gray-800">Selamat Datang, ${currentUser.nama.split(' ')[0]}</h1>
                 <p class="text-gray-500 text-sm mt-1">Sistem otomatis menyesuaikan dengan jenis pelatihan Anda (ID: ${currentUser.id_pelatihan || 'Belum Terdaftar'}).</p></div>
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             `;
-            const mData = [{m:'Widyaiswara',i:'fa-chalkboard-user',c:'text-indigo-600 bg-indigo-50'},{m:'Coach',i:'fa-user-tie',c:'text-sky-600 bg-sky-50'},{m:'Mentor',i:'fa-user-graduate',c:'text-teal-600 bg-teal-50'},{m:'Penguji',i:'fa-clipboard-user',c:'text-rose-600 bg-rose-50'},{m:'Penyelenggara',i:'fa-building',c:'text-amber-600 bg-amber-50'},{m:'Sarpras',i:'fa-building-columns',c:'text-orange-600 bg-orange-50'},{m:'LMS',i:'fa-laptop-code',c:'text-purple-600 bg-purple-50'}];
-            mData.forEach(d => {
-                html += `<div class="glass-card rounded-2xl p-4 flex flex-col items-center justify-center text-center cursor-pointer hover:-translate-y-1 shadow-sm transition-all" onclick="loadPesertaMenu('${d.m}')">
-                    <div class="w-14 h-14 rounded-2xl ${d.c} flex items-center justify-center text-2xl mb-3"><i class="fa-solid ${d.i}"></i></div>
-                    <p class="font-bold text-sm text-gray-800">${d.m}</p></div>`;
+            
+            // Generate Grid Dinamis
+            const colorPalette = ['text-indigo-600 bg-indigo-50', 'text-sky-600 bg-sky-50', 'text-teal-600 bg-teal-50', 'text-rose-600 bg-rose-50', 'text-amber-600 bg-amber-50', 'text-orange-600 bg-orange-50', 'text-purple-600 bg-purple-50', 'text-blue-600 bg-blue-50'];
+            
+            (currentUser.active_menus || []).forEach((m, idx) => {
+                let catData = (window.kategoriMaster || []).find(k => k.id === m) || { id: m, nama: m, icon: 'fa-file-lines' };
+                let colorClass = colorPalette[idx % colorPalette.length];
+                html += `<div class="glass-card rounded-2xl p-4 flex flex-col items-center justify-center text-center cursor-pointer hover:-translate-y-1 shadow-sm transition-all" onclick="loadPesertaMenu('${catData.id}')">
+                    <div class="w-14 h-14 rounded-2xl ${colorClass} flex items-center justify-center text-2xl mb-3"><i class="fa-solid ${catData.icon}"></i></div>
+                    <p class="font-bold text-sm text-gray-800">${catData.nama}</p></div>`;
             });
             container.innerHTML = html + `</div>`;
         }
-
         async function fetchPesertaData(kategori, idPelatihan) {
             let res = { pelatihans: [], questions: [], targets: [] };
             const pSnap = await window.fbGetDoc(window.fbDoc(window.db, "pelatihan", idPelatihan));
@@ -582,14 +620,27 @@
             
             const qSnap = await window.fbGetDocs(window.fbQuery(window.fbCollection(window.db, "kuesioner"), window.fbWhere("kategori", "==", kategori)));
             qSnap.forEach(doc => { let q = doc.data(); if(q.id_pelatihan === 'SEMUA' || q.id_pelatihan === idPelatihan) res.questions.push(q); });
+            
+            // Cek dinamis apakah kategori tipe SDM atau tidak
+            let isSdm = false;
+            let targetPeran = kategori;
+            if (window.kategoriMaster) {
+                 let kData = window.kategoriMaster.find(k => k.id === kategori);
+                 if (kData && kData.tipe === 'SDM') {
+                     isSdm = true;
+                     // Petakan pencarian orang ke subjek penilaian yang disetel Admin
+                     if (kData.subjek && kData.subjek !== 'Lainnya') targetPeran = kData.subjek;
+                 }
+            } else {
+                 if (['Widyaiswara', 'Coach', 'Mentor', 'Penguji'].includes(kategori)) isSdm = true;
+            }
 
-            if (['Widyaiswara', 'Coach', 'Mentor', 'Penguji'].includes(kategori)) {
-                const tSnap = await window.fbGetDocs(window.fbQuery(window.fbCollection(window.db, "pengajar"), window.fbWhere("peran", "==", kategori)));
+            if (isSdm) {
+                const tSnap = await window.fbGetDocs(window.fbQuery(window.fbCollection(window.db, "pengajar"), window.fbWhere("peran", "==", targetPeran)));
                 tSnap.forEach(doc => { let t = doc.data(); if(t.id_pelatihan === 'SEMUA' || t.id_pelatihan === idPelatihan) res.targets.push(t); });
             }
             return res;
         }
-
         async function renderFormEvaluasi(kategori, container) {
             showLoader();
             try {
@@ -603,57 +654,72 @@
                     };
                 } else { res = await fetchPesertaData(kategori, currentUser.id_pelatihan); }
                 
+                let catDataName = kategori;
+                if (window.kategoriMaster) {
+                    let cData = window.kategoriMaster.find(k => k.id === kategori);
+                    if (cData) catDataName = cData.nama;
+                }
+
                 let pelName = res.pelatihans.length > 0 ? res.pelatihans[0].nama : currentUser.id_pelatihan;
                 let html = `
                     <div class="glass-effect rounded-2xl shadow-sm overflow-hidden">
                         <div class="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white">
-                            <h2 class="text-xl font-bold"><i class="fa-solid fa-pen-to-square"></i> Evaluasi ${kategori}</h2>
+                            <h2 class="text-xl font-bold"><i class="fa-solid fa-pen-to-square"></i> Evaluasi ${catDataName}</h2>
                             <p class="text-blue-100 text-xs mt-1">Pelatihan: ${pelName}</p>
                         </div>
                         <form id="form-evaluasi" class="p-6" onsubmit="submitEvaluasi(event, '${kategori}')">
                             <input type="hidden" id="eval-pelatihan" value="${currentUser.id_pelatihan}">`;
-
+                            
                 if (res.targets.length > 0) {
                     html += `<div class="mb-6 bg-blue-50/50 p-4 rounded-xl border border-blue-100">
-                        <label class="block text-blue-900 text-xs font-bold uppercase mb-2">Pilih ${kategori} <span class="text-red-500">*</span></label>
-                        <select id="eval-target" required class="w-full px-4 py-3 border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-500 bg-white text-sm shadow-sm">
-                            <option value="">-- Silakan Pilih --</option>
+                        <label class="block text-blue-900 text-xs font-bold uppercase mb-2">Pilih Target / Pegawai <span class="text-red-500">*</span></label>
+                        <select id="eval-target" required class="w-full border border-blue-200 p-2.5 rounded-xl text-sm bg-white focus:ring-2 focus:ring-blue-500 outline-none">
+                            <option value="">-- Pilih Pegawai Terkait --</option>
                             ${res.targets.map(t => `<option value="${t.id}">${t.nama}</option>`).join('')}
-                        </select></div>`;
-                } else { html += `<input type="hidden" id="eval-target" value="-">`; }
-
-                // Sort Text questions to bottom
-                let sortedQ = [...res.questions].sort((a, b) => (a.tipe === 'text' ? 1 : 0) - (b.tipe === 'text' ? 1 : 0));
-                
-                if (sortedQ.length === 0) {
-                    html += `<div class="p-6 text-center text-gray-500 font-medium">Belum ada pertanyaan.</div>`;
+                        </select>
+                    </div>`;
                 } else {
-                    html += `<div class="space-y-5">`;
-                    sortedQ.forEach((q, idx) => {
-                        html += `<div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
-                            <p class="font-semibold text-gray-800 text-sm mb-4"><span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full text-xs mr-2">${idx + 1}</span>${q.pertanyaan}</p>`;
-                        if (q.tipe === 'likert') {
-                            html += `<div class="flex flex-wrap gap-2">
-                                ${[5,4,3,2,1].map(v => `<label class="flex flex-col items-center p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-blue-50 hover:border-blue-500 has-[:checked]:bg-blue-50 has-[:checked]:border-blue-500">
-                                    <input type="radio" name="q_${q.id}" value="${v}" required class="w-4 h-4 text-blue-600 mb-1"><span class="text-[10px] font-bold text-gray-600">${v===5?'Sangat Baik':v===4?'Baik':v===3?'Cukup':v===2?'Kurang':'Sangat Kurang'}</span></label>`).join('')}
-                            </div>`;
-                        } else if (q.tipe === 'text') {
-                            html += `<textarea name="q_${q.id}" rows="3" placeholder="Masukan..." class="w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 text-sm focus:ring-2 focus:ring-blue-500"></textarea>`;
-                        } else {
-                            html += `<input type="number" name="q_${q.id}" min="0" max="100" required placeholder="0-100" class="w-32 px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 text-sm font-semibold text-center focus:ring-2 focus:ring-blue-500">`;
-                        }
-                        html += `</div>`;
-                    });
-                    html += `</div>`;
+                    html += `<input type="hidden" id="eval-target" value="-">`;
                 }
 
-                html += `<div class="mt-8 flex justify-end"><button type="submit" class="bg-blue-600 text-white font-bold py-3.5 px-8 rounded-xl shadow-lg hover:bg-blue-700 text-sm transition-all"><i class="fa-solid fa-paper-plane mr-2"></i> Kirim</button></div>
+                if (res.questions.length === 0) {
+                    html += `<div class="text-center p-8 text-gray-500 bg-gray-50 rounded-xl border border-gray-100 border-dashed">
+                        Belum ada instrumen pertanyaan untuk kategori ini.
+                    </div>`;
+                } else {
+                    res.questions.forEach((q, idx) => {
+                        html += `<div class="mb-6 pb-6 border-b border-gray-100 last:border-0 last:pb-0 last:mb-0">
+                            <label class="block text-gray-800 text-sm font-semibold mb-3">${idx + 1}. ${q.pertanyaan}</label>`;
+                            
+                        if (q.tipe === 'likert') {
+                            html += `<div class="flex flex-wrap gap-4">
+                                ${[1, 2, 3, 4, 5].map(n => `
+                                <label class="flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-gray-50 border border-transparent hover:border-gray-200 transition-all">
+                                    <input type="radio" name="q_${q.id}" value="${n}" required class="w-4 h-4 text-blue-600 focus:ring-blue-500"> 
+                                    <span class="font-medium text-gray-700">${n}</span>
+                                </label>`).join('')}
+                            </div>`;
+                        } else if (q.tipe === '100') {
+                            html += `<input type="number" name="q_${q.id}" min="0" max="100" required class="w-full border border-gray-300 p-3 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all" placeholder="Masukkan Nilai (0 - 100)...">`;
+                        } else {
+                            html += `<textarea name="q_${q.id}" required rows="3" class="w-full border border-gray-300 p-3 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all" placeholder="Tuliskan tanggapan atau saran Anda..."></textarea>`;
+                        }
+                        
+                        html += `</div>`;
+                    });
+                }
+                
+                html += `<div class="mt-8 flex justify-end">
+                            <button type="submit" class="bg-blue-600 text-white font-bold py-3.5 px-8 rounded-xl shadow-lg shadow-blue-600/30 hover:bg-blue-700 hover:-translate-y-0.5 text-sm transition-all flex items-center gap-2">
+                                <i class="fa-solid fa-paper-plane"></i> Kirim Jawaban
+                            </button>
+                        </div>
                     </form></div>`;
+                    
                 container.innerHTML = html;
             } catch (err) { showToast(err.message, 'error'); } 
             finally { hideLoader(); }
         }
-
         async function submitEvaluasi(e, kategori) {
             e.preventDefault();
             const form = document.getElementById('form-evaluasi');
@@ -661,7 +727,6 @@
             let ans = [];
             for (let [k, v] of fd.entries()) { if (k.startsWith('q_')) ans.push({ id_pertanyaan: k.replace('q_', ''), nilai: v }); }
             if (ans.length === 0 && !form.querySelector('textarea')) return showToast('Kosong.', 'error');
-
             showLoader('Mengirim...');
             try {
                 if(window.IS_PREVIEW) {
@@ -680,17 +745,15 @@
             } catch (err) { showToast(err.message, 'error'); } 
             finally { hideLoader(); }
         }
-
-        // --- STREAMING_CHUNK: Admin Main Logic ---
+        // --- STREAMING_CHUNK: Implementing admin panel data management and rekap report view with advanced filtering... ---
         async function fetchAdminData() {
-             let res = { users:[], pelatihan:[], pengajar:[], master_pegawai:[], kuesioner:[], hasil:[] };
+             let res = { users:[], pelatihan:[], pengajar:[], master_pegawai:[], kuesioner:[], hasil:[], kategori_evaluasi:[] };
              const f = async (c, a) => { const snap = await window.fbGetDocs(window.fbCollection(window.db, c)); snap.forEach(doc => { let d=doc.data(); d.doc_id=doc.id; res[a].push(d); }); };
-             await Promise.all([f('users','users'), f('pelatihan','pelatihan'), f('pengajar','pengajar'), f('master_pegawai','master_pegawai'), f('kuesioner','kuesioner'), f('hasil','hasil')]);
+             await Promise.all([f('users','users'), f('pelatihan','pelatihan'), f('pengajar','pengajar'), f('master_pegawai','master_pegawai'), f('kuesioner','kuesioner'), f('hasil','hasil'), f('kategori_evaluasi','kategori_evaluasi')]);
              return res;
         }
-
         async function loadAdminMenu(menu) {
-            const menus = ['dashboard', 'master_pegawai', 'pelatihan', 'peserta', 'widyaiswara', 'coach', 'mentor', 'penguji', 'kuesioner', 'laporan', 'hasil', 'analisis'];
+            const menus = ['dashboard', 'kategori_evaluasi', 'master_pegawai', 'pelatihan', 'peserta', 'widyaiswara', 'coach', 'mentor', 'penguji', 'kuesioner', 'laporan', 'hasil', 'analisis', 'monitoring'];
             menus.forEach(m => {
                 const el = document.getElementById('menu-a-' + m), mobEl = document.getElementById('menu-a-mob-' + m);
                 if (el) el.className = (m === menu) ? "flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold bg-blue-600 text-white transition-all" : "flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-all";
@@ -713,24 +776,57 @@
                             <div class="bg-white p-5 rounded-2xl border-l-4 border-l-amber-500 shadow-sm"><p class="text-[10px] font-bold text-gray-400 uppercase">Soal</p><p class="text-3xl font-extrabold">${currentAdminData.kuesioner.length}</p></div>
                         </div>`;
                 } else if (menu === 'analisis') { renderAnalisisView(currentAdminData, container); } 
+                else if (menu === 'monitoring') { renderMonitoringView(currentAdminData, container); }
                 else if (menu === 'laporan') { renderLaporanRekapView(currentAdminData, container); }
                 else if (menu === 'hasil') { renderHasilEvaluasiView(currentAdminData, container); }
                 else { buildCrudTable(menu, currentAdminData, container); }
-            } catch (err) { showToast(err.message, 'error'); } 
+            } catch (err) { 
+                if (err.message.includes("Missing or insufficient permissions") || err.code === 'permission-denied') {
+                    showToast("Izin Firebase Ditolak!", 'error');
+                    container.innerHTML = `
+                        <div class="flex flex-col items-center justify-center h-full p-8 text-center w-full">
+                            <div class="bg-rose-50 p-8 rounded-3xl border border-rose-200 max-w-xl shadow-sm w-full mx-auto">
+                                <div class="w-16 h-16 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4"><i class="fa-solid fa-shield-halved"></i></div>
+                                <h3 class="text-xl font-bold text-rose-800 mb-2">Akses Database Terkunci</h3>
+                                <p class="text-sm text-rose-600 mb-6">Firebase mencegah aplikasi membaca data karena <b>Security Rules</b> (Aturan Keamanan) Anda masih ditutup.</p>
+                                <div class="text-left bg-white p-5 rounded-2xl border border-rose-100 text-xs text-slate-700 font-mono overflow-x-auto leading-relaxed shadow-inner">
+                                    <div class="font-bold font-sans text-gray-800 mb-2 pb-2 border-b border-gray-100">Cara Memperbaiki:</div>
+                                    1. Buka <a href="https://console.firebase.google.com" target="_blank" class="text-blue-600 underline font-bold">Firebase Console</a> &gt; Firestore Database<br>
+                                    2. Masuk ke tab <b>Rules</b><br>
+                                    3. Ubah kode di dalamnya menjadi:<br><br>
+                                    <div class="bg-slate-800 text-emerald-400 p-3 rounded-xl">
+                                    rules_version = '2';<br>
+                                    service cloud.firestore {<br>
+                                    &nbsp;&nbsp;match /databases/{database}/documents {<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;match /{document=**} {<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-yellow-400 font-bold">allow read, write: if true;</span><br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+                                    &nbsp;&nbsp;}<br>
+                                    }
+                                    </div><br>
+                                    4. Klik <b>Publish</b> lalu <b>Refresh (F5)</b> halaman ini.
+                                </div>
+                            </div>
+                        </div>`;
+                } else {
+                    showToast(err.message, 'error'); 
+                }
+            } 
             finally { hideLoader(); }
         }
-
-        // --- STREAMING_CHUNK: Admin Table, Sorting & Filtering logic ---
         window.buildCrudTable = function(type, data, container, filterVal = 'ALL') {
             let title = '', headers = [], rows = [], dataset = [];
             const roleMap = { widyaiswara: 'Widyaiswara', coach: 'Coach', mentor: 'Mentor', penguji: 'Penguji' };
             const isRoleMenu = roleMap.hasOwnProperty(type);
             const roleFilter = isRoleMenu ? roleMap[type] : null;
-
             if (type === 'master_pegawai') {
                 title = 'Master Pegawai'; headers = [{l:'ID',w:'id'}, {l:'Nama',w:'nama'}, {l:'Jabatan',w:'jabatan'}];
                 dataset = data.master_pegawai || [];
                 rows = dataset.map(d => [d.id, d.nama, d.jabatan || '-']);
+            } else if (type === 'kategori_evaluasi') {
+                title = 'Master Kategori Evaluasi'; headers = [{l:'ID/Kode',w:'id'}, {l:'Nama Kategori',w:'nama'}, {l:'Tipe Penilaian',w:'tipe'}, {l:'Subjek Penilaian',w:'subjek'}];
+                dataset = data.kategori_evaluasi || [];
+                rows = dataset.map(d => [d.id, d.nama, `<span class="px-2 py-1 rounded text-[10px] font-bold ${d.tipe==='SDM'?'bg-blue-100 text-blue-700':'bg-emerald-100 text-emerald-700'}">${d.tipe}</span>`, `<span class="px-2 py-1 rounded text-[10px] font-semibold bg-gray-100 text-gray-700 border border-gray-200">${d.subjek || (d.tipe==='SDM'?'Widyaiswara':'Penyelenggara')}</span>`]);
             } else if (type === 'pelatihan') {
                 title = 'Pelatihan'; headers = [{l:'ID',w:'id'}, {l:'Nama',w:'nama'}, {l:'Mulai',w:'tgl_mulai'}];
                 dataset = data.pelatihan || [];
@@ -743,27 +839,23 @@
             } else if (type === 'pengajar' || isRoleMenu) {
                 title = isRoleMenu ? roleFilter : 'Pengajar'; headers = [{l:'ID',w:'id'}, {l:'Nama',w:'nama'}, {l:'Pelatihan',w:'id_pelatihan'}];
                 dataset = (data.pengajar || []).filter(d => !roleFilter || d.peran === roleFilter);
+                if (filterVal !== 'ALL') dataset = dataset.filter(d => d.id_pelatihan === filterVal);
                 rows = dataset.map(d => [d.id, d.nama, `<span class="bg-amber-50 text-amber-700 px-2 py-1 rounded text-xs font-bold">${d.id_pelatihan || 'SEMUA'}</span>`]);
             } else if (type === 'kuesioner') {
                 title = 'Bank Soal'; headers = [{l:'ID Soal',w:'id',s:true}, {l:'Kategori',w:'kategori',s:true}, {l:'Pelatihan',w:'id_pelatihan'}, {l:'Pertanyaan',w:'pertanyaan'}];
                 dataset = data.kuesioner || [];
-                
-                // Advanced Filters
                 if (window.kuesionerState.filterPel !== 'ALL') dataset = dataset.filter(d => d.id_pelatihan === window.kuesionerState.filterPel || d.id_pelatihan === 'SEMUA');
                 if (window.kuesionerState.filterKat !== 'ALL') dataset = dataset.filter(d => d.kategori === window.kuesionerState.filterKat);
                 
-                // Sorting
                 let col = window.kuesionerState.sortCol, asc = window.kuesionerState.sortAsc;
                 dataset.sort((a, b) => {
                     let va = a[col]||'', vb = b[col]||'';
                     return asc ? va.localeCompare(vb) : vb.localeCompare(va);
                 });
-                
                 rows = dataset.map(d => [d.id, d.kategori, `<span class="bg-emerald-50 text-emerald-700 px-2 py-1 rounded text-xs font-bold">${d.id_pelatihan || 'SEMUA'}</span>`, `<span class="truncate block max-w-xs" title="${(d.pertanyaan||'').replace(/"/g,'&quot;')}">${d.pertanyaan}</span>`]);
             }
-
             let filterHTML = '';
-            if (type === 'peserta') {
+            if (type === 'peserta' || isRoleMenu) {
                 filterHTML = `<select onchange="window.buildCrudTable('${type}', currentAdminData, document.getElementById('admin-content'), this.value)" class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
                     <option value="ALL">Semua Pelatihan</option>${(data.pelatihan||[]).map(p => `<option value="${p.id}" ${filterVal===p.id?'selected':''}>${p.nama}</option>`).join('')}</select>`;
             } else if (type === 'kuesioner') {
@@ -771,15 +863,23 @@
                     <select onchange="window.kuesionerState.filterPel=this.value; window.buildCrudTable('kuesioner', currentAdminData, document.getElementById('admin-content'));" class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
                         <option value="ALL">Semua Pelatihan</option>${(data.pelatihan||[]).map(p => `<option value="${p.id}" ${window.kuesionerState.filterPel===p.id?'selected':''}>${p.nama}</option>`).join('')}</select>
                     <select onchange="window.kuesionerState.filterKat=this.value; window.buildCrudTable('kuesioner', currentAdminData, document.getElementById('admin-content'));" class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
-                        <option value="ALL">Semua Kategori</option>${['Widyaiswara','Coach','Mentor','Penguji','Penyelenggara','Sarpras','LMS'].map(k => `<option value="${k}" ${window.kuesionerState.filterKat===k?'selected':''}>${k}</option>`).join('')}</select>
+                        <option value="ALL">Semua Kategori</option>${(data.kategori_evaluasi||[]).map(k => `<option value="${k.id}" ${window.kuesionerState.filterKat===k.id?'selected':''}>${k.nama}</option>`).join('')}</select>
                 `;
             }
-
-            let actionBtns = `${filterHTML} <button onclick="openModal('${type}', 'add')" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm"><i class="fa-solid fa-plus mr-1"></i> Tambah</button>
+            
+            let actionBtns = filterHTML;
+            if (type === 'peserta') {
+                let delText = filterVal === 'ALL' ? 'Hapus Semua' : 'Hapus Sesuai Filter';
+                actionBtns += ` <button onclick="window.confirmDeleteAllPeserta('${filterVal}')" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition-all"><i class="fa-solid fa-trash-can mr-1"></i> ${delText}</button>`;
+            } else if (isRoleMenu) {
+                let delText = filterVal === 'ALL' ? 'Hapus Semua' : 'Hapus Sesuai Filter';
+                actionBtns += ` <button onclick="window.confirmDeleteAllPengajar('${type}', '${roleFilter}', '${filterVal}')" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition-all"><i class="fa-solid fa-trash-can mr-1"></i> ${delText}</button>`;
+            }
+            
+            actionBtns += ` <button onclick="openModal('${type}', 'add')" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm"><i class="fa-solid fa-plus mr-1"></i> Tambah</button>
                 <button onclick="downloadTemplate('${type}')" class="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm"><i class="fa-solid fa-download mr-1"></i> Template</button>
                 <button onclick="document.getElementById('file-upload-${type}').click()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm"><i class="fa-solid fa-upload mr-1"></i> Import</button>
                 <input type="file" id="file-upload-${type}" class="hidden" accept=".xlsx, .xls" onchange="handleExcelUpload(event, '${type}')">`;
-
             let thHTML = headers.map(h => {
                 if (h.s && type === 'kuesioner') {
                     let isSorted = window.kuesionerState.sortCol === h.w;
@@ -788,7 +888,6 @@
                 }
                 return `<th class="px-6 py-4">${h.l}</th>`;
             }).join('');
-
             let html = `<div class="flex flex-col md:flex-row justify-between mb-6 gap-4"><h2 class="text-xl font-bold text-slate-800">${title}</h2><div class="flex gap-2 flex-wrap">${actionBtns}</div></div>
                 <div class="bg-white rounded-2xl border border-gray-100 overflow-x-auto shadow-sm"><table class="w-full text-left text-sm">
                     <thead><tr class="bg-slate-50 text-slate-500 text-xs uppercase border-b">${thHTML}<th class="px-6 py-4 text-right">Aksi</th></tr></thead>
@@ -805,8 +904,7 @@
                     </tbody></table></div>`;
             container.innerHTML = html;
         };
-
-        // --- STREAMING_CHUNK: Excel Import / Export Handlers ---
+        // --- STREAMING_CHUNK: Implementing template downloading and bulk import helpers... ---
         function downloadTemplate(type) {
             let wb = XLSX.utils.book_new(), ws_data = [], fName = `Template_${type}.xlsx`;
             if(type==='master_pegawai') ws_data=[['ID_Pegawai','Nama_Lengkap','Jabatan'],['1980','Dr. A','Widyaiswara']];
@@ -816,7 +914,6 @@
             else if(type==='kuesioner') ws_data=[['ID_Pertanyaan','ID_Pelatihan','Kategori(Widyaiswara/Coach/Mentor/Penguji/Penyelenggara/Sarpras/LMS)','Tipe(likert/100/text)','Pertanyaan'],['Q1','P1','Widyaiswara','likert','Test']];
             XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(ws_data), "Sheet1"); XLSX.writeFile(wb, fName);
         }
-
         async function handleExcelUpload(e, type) {
             const file = e.target.files[0]; if(!file) return; showLoader('Membaca Excel...');
             const reader = new FileReader();
@@ -829,14 +926,13 @@
                 } catch(err) { showToast(err.message, 'error'); } finally { hideLoader(); e.target.value=''; }
             }; reader.readAsArrayBuffer(file);
         }
-
         async function saveCrudDataBulk(type, arr) {
             try {
                 if(window.IS_PREVIEW) {
                     await new Promise(r=>setTimeout(r,500));
                     arr.forEach(r => {
                         if(type==='master_pegawai') dbDummy.master_pegawai.push({id:String(r[0]),nama:r[1],jabatan:r[2]||''});
-                        else if(type==='pelatihan') dbDummy.pelatihan.push({id:String(r[0]),nama:r[1],tgl_mulai:r[2],tgl_selesai:r[3]});
+                        else if(type==='pelatihan') dbDummy.pelatihan.push({id:String(r[0]),nama:r[1],tgl_mulai:r[2],tgl_selesai:r[3], evaluasi_aktif: ['Widyaiswara','Coach','Mentor','Penguji','Penyelenggara','Sarpras','LMS']});
                         else if(type==='peserta') dbDummy.users.push({nip:String(r[0]),nama:r[1],role:'peserta',id_pelatihan:r[2]});
                         else if(['widyaiswara','coach','mentor','penguji'].includes(type)) {
                             let p = type.charAt(0).toUpperCase()+type.slice(1);
@@ -850,7 +946,7 @@
                     arr.forEach(r => {
                         let docId = String(r[0]), p = {};
                         if(type==='master_pegawai') p={id:docId,nama:r[1],jabatan:r[2]||''};
-                        else if(type==='pelatihan') p={id:docId,nama:r[1],tgl_mulai:r[2],tgl_selesai:r[3]};
+                        else if(type==='pelatihan') p={id:docId,nama:r[1],tgl_mulai:r[2],tgl_selesai:r[3], evaluasi_aktif: ['Widyaiswara','Coach','Mentor','Penguji','Penyelenggara','Sarpras','LMS']};
                         else if(type==='peserta') p={nip:docId,nama:r[1],role:'peserta',id_pelatihan:r[2]};
                         else if(cName==='pengajar') {
                             let role=type.charAt(0).toUpperCase()+type.slice(1), idPel=r[2]||'SEMUA';
@@ -862,35 +958,75 @@
                 } loadAdminMenu(type);
             } catch(e) { showToast(e.message, 'error'); }
         }
-
-        // --- STREAMING_CHUNK: Laporan Rekap (Average Scores) ---
+        // --- STREAMING_CHUNK: Implementing updated Laporan Rekap view with Widyaiswara, Coach, and Penguji filter options... ---
         function renderLaporanRekapView(data, container) {
-            let mPeg = {}; (data.master_pegawai||[]).forEach(p=>mPeg[p.id]=p.nama);
+            window.laporanFilterPel = window.laporanFilterPel || 'ALL';
+            window.laporanFilterPeran = window.laporanFilterPeran || 'ALL';
+            window.laporanFilterPegawai = window.laporanFilterPegawai || 'ALL';
+            
+            let mPeg = {}; 
+            (data.master_pegawai||[]).forEach(p=>mPeg[p.id]=p.nama);
+            (data.pengajar||[]).forEach(p=>mPeg[p.id]=p.nama); 
             let mPert = {}; (data.kuesioner||[]).forEach(q=>mPert[q.id]=q.pertanyaan);
             
-            let stats = { Widyaiswara:{}, Coach:{}, Mentor:{}, Penguji:{}, Penyelenggara:{}, Sarpras:{}, LMS:{} };
+            let stats = { 
+                Widyaiswara: { byTarget: {}, byQuestion: {}, feedback: [] }, 
+                Coach: { byTarget: {}, byQuestion: {}, feedback: [] }, 
+                Mentor: { byTarget: {}, byQuestion: {}, feedback: [] }, 
+                Penguji: { byTarget: {}, byQuestion: {}, feedback: [] }, 
+                Penyelenggara: { byQuestion: {}, feedback: [] }, 
+                Sarpras: { byQuestion: {}, feedback: [] }, 
+                LMS: { byQuestion: {}, feedback: [] } 
+            };
+            
+            // Filter hasil berdasarkan Pelatihan dan Peran / Pegawai jika dipilih
+            let filteredHasil = (data.hasil||[]).filter(h => {
+                if (window.laporanFilterPel !== 'ALL' && h.id_pelatihan !== window.laporanFilterPel) return false;
+                if (window.laporanFilterPeran !== 'ALL' && h.kategori !== window.laporanFilterPeran) return false;
+                if (window.laporanFilterPegawai !== 'ALL' && h.target_id !== window.laporanFilterPegawai) return false;
+                return true;
+            });
 
-            (data.hasil||[]).forEach(h => {
-                let v = parseFloat(h.nilai);
-                if(isNaN(v)) return; // Abaikan jawaban bertipe teks murni
-
-                // Kalibrasi semua nilai ke Skala 100 agar seragam
-                let n = v <= 5 ? (v/5)*100 : (v>100?100:v);
+            filteredHasil.forEach(h => {
                 let cat = h.kategori;
-
+                if (!stats[cat]) return;
+                let qObj = (data.kuesioner||[]).find(q => q.id === h.id_pertanyaan);
+                let isText = qObj && qObj.tipe === 'text';
+                let v = parseFloat(h.nilai);
+                if (isText || isNaN(v)) {
+                    if (h.nilai && h.nilai.trim() !== '') {
+                        let targetName = (h.target_id && h.target_id !== '-') ? (mPeg[h.target_id] || h.target_id) : null;
+                        stats[cat].feedback.push({
+                            target: targetName,
+                            pertanyaan: mPert[h.id_pertanyaan] || h.id_pertanyaan,
+                            nilai: h.nilai
+                        });
+                    }
+                    return; 
+                }
+                let n = v <= 5 ? (v/5)*100 : (v>100?100:v);
                 if (['Widyaiswara', 'Coach', 'Mentor', 'Penguji'].includes(cat)) {
                     let name = mPeg[h.target_id] || h.target_id;
-                    if(!name || name === '-') return;
-                    if(!stats[cat][name]) stats[cat][name] = {sum:0, count:0};
-                    stats[cat][name].sum += n;
-                    stats[cat][name].count++;
+                    if(name && name !== '-') {
+                        if(!stats[cat].byTarget[name]) stats[cat].byTarget[name] = {sum:0, count:0};
+                        stats[cat].byTarget[name].sum += n;
+                        stats[cat].byTarget[name].count++;
+                    }
+                    let pert = mPert[h.id_pertanyaan] || h.id_pertanyaan;
+                    if(!stats[cat].byQuestion[pert]) stats[cat].byQuestion[pert] = {sum:0, count:0};
+                    stats[cat].byQuestion[pert].sum += n;
+                    stats[cat].byQuestion[pert].count++;
                 } else if (['Penyelenggara', 'Sarpras', 'LMS'].includes(cat)) {
                     let pert = mPert[h.id_pertanyaan] || h.id_pertanyaan;
-                    if(!stats[cat][pert]) stats[cat][pert] = {sum:0, count:0};
-                    stats[cat][pert].sum += n;
-                    stats[cat][pert].count++;
+                    if(!stats[cat].byQuestion[pert]) stats[cat].byQuestion[pert] = {sum:0, count:0};
+                    stats[cat].byQuestion[pert].sum += n;
+                    stats[cat].byQuestion[pert].count++;
                 }
             });
+            window.currentLaporanStats = stats; 
+
+            // Daftar opsi pegawai berdasarkan peran yang dipilih
+            let availablePegawai = (data.pengajar||[]).filter(p => window.laporanFilterPeran === 'ALL' || p.peran === window.laporanFilterPeran);
 
             const renderTable = (title, dataObj, col1Name) => {
                 let rows = Object.keys(dataObj).map(key => {
@@ -898,7 +1034,6 @@
                     return `<tr class="hover:bg-gray-50"><td class="p-3 border-b text-gray-700">${key}</td><td class="p-3 border-b font-bold text-blue-600 text-center">${avg}</td></tr>`;
                 }).join('');
                 if(!rows) rows = `<tr><td colspan="2" class="p-4 border-b text-center text-gray-400">Belum ada data evaluasi</td></tr>`;
-
                 return `
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
                     <div class="bg-slate-50 p-4 border-b border-gray-200 font-bold text-slate-700 text-sm">${title}</div>
@@ -908,143 +1043,377 @@
                     </table>
                 </div>`;
             };
+            
+            const renderFeedback = (kategori, feedbacks) => {
+                if (feedbacks.length === 0) return '';
+                let listHtml = feedbacks.map(f => {
+                    let targetHtml = f.target ? `<span class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded text-[10px] ml-2 font-semibold">Terkait: ${f.target}</span>` : '';
+                    return `<div class="p-3 border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors">
+                        <p class="text-xs font-semibold text-gray-600 mb-1 leading-tight">${f.pertanyaan} ${targetHtml}</p>
+                        <p class="text-sm text-gray-800 italic">"${f.nilai}"</p>
+                    </div>`;
+                }).join('');
+                return `
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-4">
+                    <div class="bg-slate-50 p-3 border-b border-gray-200 font-bold text-slate-700 text-sm flex items-center justify-between sticky top-0">
+                        <span>Catatan: ${kategori}</span>
+                        <span class="bg-rose-100 text-rose-700 px-2 py-0.5 rounded-full text-[10px]">${feedbacks.length} masukan</span>
+                    </div>
+                    <div class="max-h-60 overflow-y-auto">${listHtml}</div>
+                </div>`;
+            };
 
             let html = `
-                <div class="mb-6">
-                    <h2 class="text-xl font-bold text-slate-800">Laporan Rekapitulasi Evaluasi</h2>
-                    <p class="text-xs text-gray-500 mt-1">Data dikalkulasi secara otomatis. Nilai rating (1-5) telah dikonversi ke skala 100.</p>
-                </div>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="mb-6 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
                     <div>
-                        <h3 class="font-bold text-blue-800 mb-4 border-b-2 border-blue-100 pb-2 flex items-center gap-2"><i class="fa-solid fa-users text-blue-500"></i> A. Evaluasi Pengajar / SDM</h3>
-                        ${renderTable('1. Rata-rata per Widyaiswara', stats.Widyaiswara, 'Nama Widyaiswara')}
-                        ${renderTable('2. Rata-rata per Coach', stats.Coach, 'Nama Coach')}
-                        ${renderTable('3. Rata-rata per Mentor', stats.Mentor, 'Nama Mentor')}
-                        ${renderTable('4. Rata-rata per Penguji', stats.Penguji, 'Nama Penguji')}
+                        <h2 class="text-xl font-bold text-slate-800">Laporan Rekapitulasi Evaluasi</h2>
+                        <p class="text-xs text-gray-500 mt-1">Data dikalkulasi secara otomatis dengan filter spesifik Widyaiswara, Coach, atau Penguji.</p>
                     </div>
-                    <div>
-                        <h3 class="font-bold text-emerald-800 mb-4 border-b-2 border-emerald-100 pb-2 flex items-center gap-2"><i class="fa-solid fa-building text-emerald-500"></i> B. Evaluasi Fasilitas & Penyelenggaraan</h3>
-                        ${renderTable('1. Hasil Evaluasi Penyelenggara', stats.Penyelenggara, 'Pertanyaan')}
-                        ${renderTable('2. Hasil Evaluasi Sarpras', stats.Sarpras, 'Pertanyaan')}
-                        ${renderTable('3. Hasil Evaluasi LMS / E-Learning', stats.LMS, 'Pertanyaan')}
+                    <div class="flex flex-wrap gap-2 items-center">
+                        <select id="flt-lap-pel" onchange="window.laporanFilterPel=this.value; loadAdminMenu('laporan');" class="border border-slate-300 bg-white px-3 py-2 rounded-xl text-sm shadow-sm">
+                            <option value="ALL">Semua Pelatihan</option>
+                            ${(data.pelatihan||[]).map(p=>`<option value="${p.id}" ${window.laporanFilterPel===p.id?'selected':''}>${p.nama}</option>`).join('')}
+                        </select>
+                        <select id="flt-lap-peran" onchange="window.laporanFilterPeran=this.value; window.laporanFilterPegawai='ALL'; loadAdminMenu('laporan');" class="border border-slate-300 bg-white px-3 py-2 rounded-xl text-sm shadow-sm">
+                            <option value="ALL">Semua Peran / SDM</option>
+                            <option value="Widyaiswara" ${window.laporanFilterPeran==='Widyaiswara'?'selected':''}>Widyaiswara</option>
+                            <option value="Coach" ${window.laporanFilterPeran==='Coach'?'selected':''}>Coach</option>
+                            <option value="Mentor" ${window.laporanFilterPeran==='Mentor'?'selected':''}>Mentor</option>
+                            <option value="Penguji" ${window.laporanFilterPeran==='Penguji'?'selected':''}>Penguji</option>
+                        </select>
+                        <select id="flt-lap-peg" onchange="window.laporanFilterPegawai=this.value; loadAdminMenu('laporan');" class="border border-slate-300 bg-white px-3 py-2 rounded-xl text-sm shadow-sm">
+                            <option value="ALL">Semua Nama Pegawai</option>
+                            ${availablePegawai.map(p=>`<option value="${p.id}" ${window.laporanFilterPegawai===p.id?'selected':''}>${p.nama} (${p.peran})</option>`).join('')}
+                        </select>
+                        <button onclick="exportLaporanRekap('excel')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-sm font-bold shadow transition-all flex items-center gap-2"><i class="fa-solid fa-file-excel"></i> Excel</button>
+                        <button onclick="exportLaporanRekap('pdf')" class="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-xl text-sm font-bold shadow transition-all flex items-center gap-2"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+                    </div>
+                </div>
+                
+                <!-- TABS NAVIGATION -->
+                <div class="flex border-b border-gray-200 mb-6 overflow-x-auto no-scrollbar">
+                    <button onclick="window.switchLaporanTab('sdm')" id="tab-btn-sdm" class="px-5 py-3 font-bold text-sm border-b-2 border-blue-600 text-blue-600 whitespace-nowrap transition-all"><i class="fa-solid fa-users mr-2"></i>Evaluasi Pengajar / SDM</button>
+                    <button onclick="window.switchLaporanTab('fasilitas')" id="tab-btn-fasilitas" class="px-5 py-3 font-semibold text-sm border-b-2 border-transparent text-gray-500 hover:text-gray-700 whitespace-nowrap transition-all"><i class="fa-solid fa-building mr-2"></i>Evaluasi Fasilitas</button>
+                    <button onclick="window.switchLaporanTab('saran')" id="tab-btn-saran" class="px-5 py-3 font-semibold text-sm border-b-2 border-transparent text-gray-500 hover:text-gray-700 whitespace-nowrap transition-all"><i class="fa-solid fa-comments mr-2"></i>Kritik & Saran</button>
+                </div>
+                
+                <!-- TAB CONTENT: PENGAJAR / SDM -->
+                <div id="tab-content-sdm" class="block">
+                    <div class="mb-8">
+                        <h3 class="font-bold text-blue-800 mb-4 border-b-2 border-blue-100 pb-2 flex items-center gap-2"><i class="fa-solid fa-user-tie text-blue-500"></i> A. Rata-rata per Orang</h3>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            ${(window.laporanFilterPeran === 'ALL' || window.laporanFilterPeran === 'Widyaiswara') ? renderTable('1. Widyaiswara', stats.Widyaiswara.byTarget, 'Nama Widyaiswara') : ''}
+                            ${(window.laporanFilterPeran === 'ALL' || window.laporanFilterPeran === 'Coach') ? renderTable('2. Coach', stats.Coach.byTarget, 'Nama Coach') : ''}
+                            ${(window.laporanFilterPeran === 'ALL' || window.laporanFilterPeran === 'Mentor') ? renderTable('3. Mentor', stats.Mentor.byTarget, 'Nama Mentor') : ''}
+                            ${(window.laporanFilterPeran === 'ALL' || window.laporanFilterPeran === 'Penguji') ? renderTable('4. Penguji', stats.Penguji.byTarget, 'Nama Penguji') : ''}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-8">
+                        <h3 class="font-bold text-indigo-800 mb-4 border-b-2 border-indigo-100 pb-2 flex items-center gap-2"><i class="fa-solid fa-list-check text-indigo-500"></i> B. Rata-rata per Pertanyaan</h3>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            ${(window.laporanFilterPeran === 'ALL' || window.laporanFilterPeran === 'Widyaiswara') ? renderTable('Pertanyaan Widyaiswara', stats.Widyaiswara.byQuestion, 'Pertanyaan') : ''}
+                            ${(window.laporanFilterPeran === 'ALL' || window.laporanFilterPeran === 'Coach') ? renderTable('Pertanyaan Coach', stats.Coach.byQuestion, 'Pertanyaan') : ''}
+                            ${(window.laporanFilterPeran === 'ALL' || window.laporanFilterPeran === 'Mentor') ? renderTable('Pertanyaan Mentor', stats.Mentor.byQuestion, 'Pertanyaan') : ''}
+                            ${(window.laporanFilterPeran === 'ALL' || window.laporanFilterPeran === 'Penguji') ? renderTable('Pertanyaan Penguji', stats.Penguji.byQuestion, 'Pertanyaan') : ''}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- TAB CONTENT: FASILITAS -->
+                <div id="tab-content-fasilitas" class="hidden">
+                    <div class="mb-8">
+                        <h3 class="font-bold text-emerald-800 mb-4 border-b-2 border-emerald-100 pb-2 flex items-center gap-2"><i class="fa-solid fa-building-columns text-emerald-500"></i> C. Evaluasi Fasilitas & Penyelenggaraan</h3>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            ${renderTable('1. Penyelenggara', stats.Penyelenggara.byQuestion, 'Pertanyaan')}
+                            ${renderTable('2. Sarpras', stats.Sarpras.byQuestion, 'Pertanyaan')}
+                            ${renderTable('3. LMS / E-Learning', stats.LMS.byQuestion, 'Pertanyaan')}
+                        </div>
+                    </div>
+                </div>
+                <!-- TAB CONTENT: SARAN -->
+                <div id="tab-content-saran" class="hidden">
+                    <div class="mb-8">
+                        <h3 class="font-bold text-rose-800 mb-4 border-b-2 border-rose-100 pb-2 flex items-center gap-2"><i class="fa-solid fa-comments text-rose-500"></i> D. Rekap Catatan / Kritik / Saran Peserta</h3>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div class="space-y-4">
+                                <h4 class="font-bold text-sm text-gray-600 uppercase tracking-wider mb-2">Terkait Pengajar / SDM</h4>
+                                ${(window.laporanFilterPeran === 'ALL' || window.laporanFilterPeran === 'Widyaiswara') ? renderFeedback('Widyaiswara', stats.Widyaiswara.feedback) : ''}
+                                ${(window.laporanFilterPeran === 'ALL' || window.laporanFilterPeran === 'Coach') ? renderFeedback('Coach', stats.Coach.feedback) : ''}
+                                ${(window.laporanFilterPeran === 'ALL' || window.laporanFilterPeran === 'Mentor') ? renderFeedback('Mentor', stats.Mentor.feedback) : ''}
+                                ${(window.laporanFilterPeran === 'ALL' || window.laporanFilterPeran === 'Penguji') ? renderFeedback('Penguji', stats.Penguji.feedback) : ''}
+                            </div>
+                            <div class="space-y-4">
+                                <h4 class="font-bold text-sm text-gray-600 uppercase tracking-wider mb-2">Terkait Fasilitas</h4>
+                                ${renderFeedback('Penyelenggara', stats.Penyelenggara.feedback)}
+                                ${renderFeedback('Sarpras', stats.Sarpras.feedback)}
+                                ${renderFeedback('LMS', stats.LMS.feedback)}
+                            </div>
+                        </div>
                     </div>
                 </div>
             `;
             container.innerHTML = html;
         }
-
-        // --- STREAMING_CHUNK: Results Evaluation (Mapped Names & Export) ---
+        window.switchLaporanTab = function(tabName) {
+            const tabs = ['sdm', 'fasilitas', 'saran'];
+            tabs.forEach(t => {
+                const btn = document.getElementById('tab-btn-' + t);
+                const content = document.getElementById('tab-content-' + t);
+                if (btn && content) {
+                    if (t === tabName) {
+                        btn.className = "px-5 py-3 font-bold text-sm border-b-2 border-blue-600 text-blue-600 whitespace-nowrap transition-all";
+                        content.classList.remove('hidden');
+                        content.classList.add('block');
+                    } else {
+                        btn.className = "px-5 py-3 font-semibold text-sm border-b-2 border-transparent text-gray-500 hover:text-gray-700 whitespace-nowrap transition-all";
+                        content.classList.remove('block');
+                        content.classList.add('hidden');
+                    }
+                }
+            });
+        };
+        window.exportLaporanRekap = function(fmt) {
+            let stats = window.currentLaporanStats;
+            if(!stats) return showToast('Data kosong.', 'error');
+            let dataExcel = [], jspdfData = [];
+            let fPeran = window.laporanFilterPeran || 'ALL';
+            
+            const pushData = (title, statObj) => {
+                dataExcel.push([title]);
+                dataExcel.push(['Nama / Pertanyaan', 'Rata-Rata (Skala 0-100)']);
+                let keys = Object.keys(statObj);
+                if(keys.length === 0) { dataExcel.push(['Tidak ada data', '0']); jspdfData.push([title, 'Tidak ada data', '0']); }
+                keys.forEach(k => {
+                    let avg = (statObj[k].sum / statObj[k].count).toFixed(2);
+                    dataExcel.push([k, avg]); jspdfData.push([title, k, avg]);
+                });
+                dataExcel.push([]); 
+            };
+            const pushFeedbackData = (title, feedbacks) => {
+                if(feedbacks.length === 0) return;
+                dataExcel.push([`Catatan/Saran: ${title}`]);
+                dataExcel.push(['Target', 'Pertanyaan', 'Catatan Peserta']);
+                feedbacks.forEach(f => {
+                    dataExcel.push([f.target || '-', f.pertanyaan, f.nilai]);
+                });
+                dataExcel.push([]);
+            };
+            if(fPeran === 'ALL' || fPeran === 'Widyaiswara') { pushData('Widyaiswara (Per Orang)', stats.Widyaiswara.byTarget); pushData('Widyaiswara (Per Pertanyaan)', stats.Widyaiswara.byQuestion); }
+            if(fPeran === 'ALL' || fPeran === 'Coach') { pushData('Coach (Per Orang)', stats.Coach.byTarget); pushData('Coach (Per Pertanyaan)', stats.Coach.byQuestion); }
+            if(fPeran === 'ALL' || fPeran === 'Mentor') { pushData('Mentor (Per Orang)', stats.Mentor.byTarget); pushData('Mentor (Per Pertanyaan)', stats.Mentor.byQuestion); }
+            if(fPeran === 'ALL' || fPeran === 'Penguji') { pushData('Penguji (Per Orang)', stats.Penguji.byTarget); pushData('Penguji (Per Pertanyaan)', stats.Penguji.byQuestion); }
+            
+            if(fPeran === 'ALL') {
+                pushData('Penyelenggara', stats.Penyelenggara.byQuestion); 
+                pushData('Sarpras', stats.Sarpras.byQuestion); 
+                pushData('LMS', stats.LMS.byQuestion);
+            }
+            if(fmt === 'excel') {
+                if(fPeran === 'ALL' || fPeran === 'Widyaiswara') pushFeedbackData('Widyaiswara', stats.Widyaiswara.feedback);
+                if(fPeran === 'ALL' || fPeran === 'Coach') pushFeedbackData('Coach', stats.Coach.feedback);
+                if(fPeran === 'ALL' || fPeran === 'Mentor') pushFeedbackData('Mentor', stats.Mentor.feedback);
+                if(fPeran === 'ALL' || fPeran === 'Penguji') pushFeedbackData('Penguji', stats.Penguji.feedback);
+                if(fPeran === 'ALL') {
+                    pushFeedbackData('Penyelenggara', stats.Penyelenggara.feedback);
+                    pushFeedbackData('Sarpras', stats.Sarpras.feedback);
+                    pushFeedbackData('LMS', stats.LMS.feedback);
+                }
+            }
+            if(fmt === 'excel') {
+                let wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(dataExcel), "Laporan Rekapitulasi");
+                XLSX.writeFile(wb, `Laporan_Rekap_${Date.now()}.xlsx`);
+                showToast('Download Excel Berhasil', 'success');
+            } else {
+                const doc = new window.jspdf.jsPDF();
+                doc.text("Laporan Rekapitulasi Rata-Rata Evaluasi (Skala 100)", 14, 15);
+                doc.setFontSize(9);
+                doc.autoTable({
+                    head: [['Kategori', 'Nama Pegawai / Pertanyaan Evaluasi', 'Nilai Rata-Rata']],
+                    body: jspdfData,
+                    startY: 20,
+                    styles: { fontSize: 8 }, columnStyles: { 1: { cellWidth: 100 } }
+                });
+                let finalY = doc.lastAutoTable.finalY || 20;
+                doc.text("* Catatan dan saran tekstual tidak disertakan dalam PDF ini.", 14, finalY + 10);
+                doc.save(`Laporan_Rekap_${Date.now()}.pdf`);
+                showToast('Download PDF Berhasil', 'success');
+            }
+        };
+        // --- STREAMING_CHUNK: Implementing raw evaluation results view and analysis chart dashboards... ---
         function renderHasilEvaluasiView(data, container) {
             let html = `
-                <div class="flex flex-wrap justify-between mb-4 gap-2">
+                <div class="flex flex-wrap justify-between items-center mb-6 gap-4">
                     <h2 class="text-xl font-bold text-slate-800">Raw Data Hasil Evaluasi</h2>
-                    <div class="flex gap-2">
-                        <select id="flt-pel" onchange="applyHasilFilter()" class="border px-3 py-2 rounded-lg text-sm"><option value="ALL">Semua Pelatihan</option>${(data.pelatihan||[]).map(p=>`<option value="${p.id}">${p.nama}</option>`).join('')}</select>
-                        <select id="flt-kat" onchange="applyHasilFilter()" class="border px-3 py-2 rounded-lg text-sm"><option value="ALL">Semua Kategori</option>${['Widyaiswara','Coach','Mentor','Penguji','Penyelenggara','Sarpras','LMS'].map(k=>`<option value="${k}">${k}</option>`).join('')}</select>
-                        <select id="flt-peg" onchange="applyHasilFilter()" class="border px-3 py-2 rounded-lg text-sm"><option value="ALL">Semua Pegawai</option>${(data.master_pegawai||[]).map(p=>`<option value="${p.id}">${p.nama}</option>`).join('')}</select>
-                        <button onclick="exportHasil('excel')" class="bg-emerald-600 text-white px-3 py-2 rounded-lg text-sm font-bold shadow"><i class="fa-solid fa-file-excel"></i></button>
-                        <button onclick="exportHasil('pdf')" class="bg-rose-600 text-white px-3 py-2 rounded-lg text-sm font-bold shadow"><i class="fa-solid fa-file-pdf"></i></button>
+                    <div class="flex flex-wrap gap-2">
+                        <select id="flt-pel" onchange="applyHasilFilter()" class="border border-slate-300 bg-white px-3 py-2 rounded-xl text-sm shadow-sm"><option value="ALL">Semua Pelatihan</option>${(data.pelatihan||[]).map(p=>`<option value="${p.id}">${p.nama}</option>`).join('')}</select>
+                        <select id="flt-kat" onchange="applyHasilFilter()" class="border border-slate-300 bg-white px-3 py-2 rounded-xl text-sm shadow-sm"><option value="ALL">Semua Kategori</option>${(data.kategori_evaluasi||[]).map(k=>`<option value="${k.id}">${k.nama}</option>`).join('')}</select>
+                        <select id="flt-peg" onchange="applyHasilFilter()" class="border border-slate-300 bg-white px-3 py-2 rounded-xl text-sm shadow-sm"><option value="ALL">Semua Pegawai</option>${(data.master_pegawai||[]).map(p=>`<option value="${p.id}">${p.nama}</option>`).join('')}</select>
+                        <button onclick="exportHasil('excel')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-xl text-sm font-bold shadow transition-all"><i class="fa-solid fa-file-excel mr-1"></i> Excel</button>
+                        <button onclick="exportHasil('pdf')" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-2 rounded-xl text-sm font-bold shadow transition-all"><i class="fa-solid fa-file-pdf mr-1"></i> PDF</button>
                     </div>
                 </div>
                 <div class="bg-white rounded-2xl border overflow-x-auto shadow-sm">
                     <table class="w-full text-left text-sm">
-                        <thead><tr class="bg-slate-50 text-xs uppercase text-slate-500 border-b"><th class="p-4">NIP</th><th class="p-4">Pelatihan</th><th class="p-4">Kategori</th><th class="p-4">Pegawai/Target</th><th class="p-4 w-1/3">Pertanyaan</th><th class="p-4">Nilai</th></tr></thead>
-                        <tbody id="tbl-hasil-body">${renderHasilRowsHTML(data.hasil||[],'ALL','ALL','ALL')}</tbody>
+                        <thead><tr class="bg-slate-50 text-xs uppercase text-slate-500 border-b"><th class="p-4">NIP</th><th class="p-4">Pelatihan</th><th class="p-4">Kategori</th><th class="p-4">Pegawai/Target</th><th class="p-4 w-1/3">Pertanyaan</th><th class="p-4">Nilai</th><th class="p-4 text-right">Aksi</th></tr></thead>
+                        <tbody id="tbl-hasil-body" class="divide-y divide-gray-100">${renderHasilRowsHTML(data.hasil||[],'ALL','ALL','ALL')}</tbody>
                     </table>
                 </div>`;
             container.innerHTML = html;
         }
-
         function applyHasilFilter() { document.getElementById('tbl-hasil-body').innerHTML = renderHasilRowsHTML(currentAdminData.hasil||[], document.getElementById('flt-pel').value, document.getElementById('flt-kat').value, document.getElementById('flt-peg').value); }
-
         function renderHasilRowsHTML(list, fp, fk, ft) {
             let filtered = list;
             if (fp !== 'ALL') filtered = filtered.filter(h => h.id_pelatihan === fp);
             if (fk !== 'ALL') filtered = filtered.filter(h => h.kategori === fk);
             if (ft !== 'ALL') filtered = filtered.filter(h => h.target_id === ft);
             
-            if (filtered.length === 0) return `<tr><td colspan="6" class="p-8 text-center text-gray-400">Kosong.</td></tr>`;
+            if (filtered.length === 0) return `<tr><td colspan="7" class="p-8 text-center text-gray-400">Belum ada data/kosong.</td></tr>`;
             
             let mPeg={}, mPel={}, mPert={};
             (currentAdminData.master_pegawai||[]).forEach(p=>mPeg[p.id]=p.nama);
+            (currentAdminData.pengajar||[]).forEach(p=>mPeg[p.id]=p.nama); 
             (currentAdminData.pelatihan||[]).forEach(p=>mPel[p.id]=p.nama);
             (currentAdminData.kuesioner||[]).forEach(q=>mPert[q.id]=q.pertanyaan);
-
-            return filtered.map(h => `
-                <tr class="hover:bg-slate-50 border-b">
+            return filtered.map(h => {
+                let targetName = (h.target_id && h.target_id !== '-') ? (mPeg[h.target_id] || h.target_id) : '-';
+                return `
+                <tr class="hover:bg-slate-50">
                     <td class="p-4">${h.nip}</td>
                     <td class="p-4 text-xs font-semibold"><span class="truncate block w-32" title="${mPel[h.id_pelatihan]||h.id_pelatihan}">${mPel[h.id_pelatihan]||h.id_pelatihan}</span></td>
                     <td class="p-4"><span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">${h.kategori}</span></td>
-                    <td class="p-4 text-xs font-semibold whitespace-nowrap">${(h.target_id&&h.target_id!=='-')?(mPeg[h.target_id]||h.target_id):'-'}</td>
+                    <td class="p-4 text-xs font-semibold whitespace-nowrap">${targetName}</td>
                     <td class="p-4 text-xs text-gray-600">${mPert[h.id_pertanyaan]||h.id_pertanyaan}</td>
                     <td class="p-4 font-bold text-gray-900">${h.nilai}</td>
-                </tr>`).join('');
+                    <td class="p-4 text-right">
+                        <button onclick="hapusSatuHasil('${h.id_jawaban}')" title="Hapus Data Ini" class="text-rose-500 bg-rose-50 w-8 h-8 rounded-lg hover:bg-rose-100 transition-colors shadow-sm"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>`;
+            }).join('');
         }
-
+        window.hapusSatuHasil = async function(id_jawaban) {
+            showLoader('Menghapus data...');
+            try {
+                if(window.IS_PREVIEW) {
+                    await new Promise(r=>setTimeout(r,400));
+                    dbDummy.hasil = dbDummy.hasil.filter(h => h.id_jawaban !== id_jawaban);
+                    showToast('Data dihapus (Preview)','success');
+                } else {
+                    await window.fbDeleteDoc(window.fbDoc(window.db, 'hasil', id_jawaban));
+                    showToast('Data dihapus dari Database','success');
+                }
+                loadAdminMenu('hasil');
+            } catch (err) { showToast(err.message, 'error'); }
+            finally { hideLoader(); }
+        };
         function exportHasil(fmt) {
             let fp = document.getElementById('flt-pel').value, fk = document.getElementById('flt-kat').value, ft = document.getElementById('flt-peg').value;
             let filtered = (currentAdminData.hasil||[]).filter(h => (fp==='ALL'||h.id_pelatihan===fp) && (fk==='ALL'||h.kategori===fk) && (ft==='ALL'||h.target_id===ft));
             if(filtered.length===0) return showToast('Kosong', 'error');
-
             let mPeg={}, mPel={}, mPert={};
             (currentAdminData.master_pegawai||[]).forEach(p=>mPeg[p.id]=p.nama);
+            (currentAdminData.pengajar||[]).forEach(p=>mPeg[p.id]=p.nama);
             (currentAdminData.pelatihan||[]).forEach(p=>mPel[p.id]=p.nama);
             (currentAdminData.kuesioner||[]).forEach(q=>mPert[q.id]=q.pertanyaan);
-
-            let data = filtered.map(h => [h.nip, mPel[h.id_pelatihan]||h.id_pelatihan, h.kategori, (h.target_id&&h.target_id!=='-')?(mPeg[h.target_id]||h.target_id):'-', mPert[h.id_pertanyaan]||h.id_pertanyaan, h.nilai]);
+            let data = filtered.map(h => {
+                let targetName = (h.target_id && h.target_id !== '-') ? (mPeg[h.target_id] || h.target_id) : '-';
+                return [h.nip, mPel[h.id_pelatihan]||h.id_pelatihan, h.kategori, targetName, mPert[h.id_pertanyaan]||h.id_pertanyaan, h.nilai];
+            });
             let headers = ['NIP', 'Pelatihan', 'Kategori', 'Pegawai', 'Pertanyaan', 'Jawaban'];
-
             if(fmt==='excel'){
                 let wb = XLSX.utils.book_new(); data.unshift(headers);
-                XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(data), "Laporan"); XLSX.writeFile(wb, `Laporan_${Date.now()}.xlsx`);
+                XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(data), "Data_Raw_Hasil"); XLSX.writeFile(wb, `RawData_Evaluasi_${Date.now()}.xlsx`);
             } else {
                 const doc = new window.jspdf.jsPDF('landscape');
-                doc.text("Laporan Evaluasi", 14, 15); doc.setFontSize(9);
+                doc.text("Laporan Raw Data Evaluasi", 14, 15); doc.setFontSize(9);
                 doc.autoTable({ head: [headers], body: data, startY: 20, styles: { fontSize: 7 }, columnStyles: { 4: { cellWidth: 90 } } });
-                doc.save(`Laporan_${Date.now()}.pdf`);
+                doc.save(`RawData_Evaluasi_${Date.now()}.pdf`);
             }
         }
-
-        // --- STREAMING_CHUNK: Data Analysis and Visualization ---
+        // --- STREAMING_CHUNK: Implementing analysis view, progress monitoring, and CRUD modal functions... ---
         function renderAnalisisView(data, container) {
+            window.analisisFilterPel = window.analisisFilterPel || 'ALL';
+            
             let html = `
-                <div class="mb-6"><h2 class="text-xl font-bold text-slate-800">Analisis Data Visual</h2><p class="text-xs text-gray-500 mt-1">Skala 100 (Likert 1-5 dikonversi otomatis).</p></div>
+                <div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800">Analisis Data Visual (Dashboard)</h2>
+                        <p class="text-xs text-gray-500 mt-1">Skala 100 (Likert 1-5 dikonversi otomatis).</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2 items-center">
+                        <select id="flt-ana-pel" onchange="window.analisisFilterPel=this.value; loadAdminMenu('analisis');" class="border border-slate-300 bg-white px-3 py-2 rounded-xl text-sm shadow-sm">
+                            <option value="ALL">Semua Pelatihan</option>
+                            ${(data.pelatihan||[]).map(p=>`<option value="${p.id}" ${window.analisisFilterPel===p.id?'selected':''}>${p.nama}</option>`).join('')}
+                        </select>
+                        <button onclick="exportAnalisisPDF()" class="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-xl text-sm font-bold shadow transition-all flex items-center gap-2"><i class="fa-solid fa-file-pdf"></i> Export Grafik PDF</button>
+                    </div>
+                </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    <div class="bg-white p-5 rounded-2xl border h-[300px]"><h4 class="font-bold text-sm text-slate-700 mb-2 border-b pb-2"><i class="fa-solid fa-chalkboard-user text-indigo-500 mr-2"></i>Widyaiswara</h4><canvas id="c-wid"></canvas></div>
-                    <div class="bg-white p-5 rounded-2xl border h-[300px]"><h4 class="font-bold text-sm text-slate-700 mb-2 border-b pb-2"><i class="fa-solid fa-user-tie text-sky-500 mr-2"></i>Coach</h4><canvas id="c-coa"></canvas></div>
-                    <div class="bg-white p-5 rounded-2xl border h-[300px]"><h4 class="font-bold text-sm text-slate-700 mb-2 border-b pb-2"><i class="fa-solid fa-user-graduate text-teal-500 mr-2"></i>Mentor</h4><canvas id="c-men"></canvas></div>
-                    <div class="bg-white p-5 rounded-2xl border h-[300px]"><h4 class="font-bold text-sm text-slate-700 mb-2 border-b pb-2"><i class="fa-solid fa-clipboard-user text-rose-500 mr-2"></i>Penguji</h4><canvas id="c-pen"></canvas></div>
+                    <div class="bg-white p-5 rounded-2xl border flex flex-col"><h4 class="font-bold text-sm text-slate-700 mb-2 border-b pb-2"><i class="fa-solid fa-chalkboard-user text-indigo-500 mr-2"></i>Widyaiswara</h4><div class="h-[250px]"><canvas id="c-wid"></canvas></div><div id="leg-wid" class="mt-3 overflow-y-auto max-h-24"></div></div>
+                    <div class="bg-white p-5 rounded-2xl border flex flex-col"><h4 class="font-bold text-sm text-slate-700 mb-2 border-b pb-2"><i class="fa-solid fa-user-tie text-sky-500 mr-2"></i>Coach</h4><div class="h-[250px]"><canvas id="c-coa"></canvas></div><div id="leg-coa" class="mt-3 overflow-y-auto max-h-24"></div></div>
+                    <div class="bg-white p-5 rounded-2xl border flex flex-col"><h4 class="font-bold text-sm text-slate-700 mb-2 border-b pb-2"><i class="fa-solid fa-user-graduate text-teal-500 mr-2"></i>Mentor</h4><div class="h-[250px]"><canvas id="c-men"></canvas></div><div id="leg-men" class="mt-3 overflow-y-auto max-h-24"></div></div>
+                    <div class="bg-white p-5 rounded-2xl border flex flex-col"><h4 class="font-bold text-sm text-slate-700 mb-2 border-b pb-2"><i class="fa-solid fa-clipboard-user text-rose-500 mr-2"></i>Penguji</h4><div class="h-[250px]"><canvas id="c-pen"></canvas></div><div id="leg-pen" class="mt-3 overflow-y-auto max-h-24"></div></div>
                     <div class="bg-white p-5 rounded-2xl border h-[350px] md:col-span-2 flex flex-col items-center"><h4 class="font-bold text-sm text-slate-700 mb-2 w-full text-left border-b pb-2"><i class="fa-solid fa-building text-amber-500 mr-2"></i>Fasilitas Umum (Panitia, Sarpras, LMS)</h4><div class="w-full h-full max-w-xl pb-6"><canvas id="c-umu"></canvas></div></div>
                 </div>`;
             container.innerHTML = html;
             setTimeout(() => renderAnalisisCharts(data), 100);
         }
-
         function renderAnalisisCharts(data) {
-            let mPeg = {}; (data.master_pegawai||[]).forEach(p=>mPeg[p.id]=p.nama);
+            let mPeg = {}; 
+            (data.master_pegawai||[]).forEach(p=>mPeg[p.id]=p.nama);
+            (data.pengajar||[]).forEach(p=>mPeg[p.id]=p.nama);
             let s = { Widyaiswara:{}, Coach:{}, Mentor:{}, Penguji:{} };
             let su = { Penyelenggara:{t:0,c:0}, Sarpras:{t:0,c:0}, LMS:{t:0,c:0} };
-
-            (data.hasil||[]).forEach(h => {
+            let filteredHasil = (data.hasil||[]).filter(h => window.analisisFilterPel === 'ALL' || h.id_pelatihan === window.analisisFilterPel);
+            filteredHasil.forEach(h => {
                 let v = parseFloat(h.nilai); if(isNaN(v)) return;
                 let n = v <= 5 ? (v/5)*100 : (v>100?100:v);
+                
                 if(['Widyaiswara','Coach','Mentor','Penguji'].includes(h.kategori) && h.target_id && h.target_id !=='-') {
-                    let pn = mPeg[h.target_id]||h.target_id;
-                    if(!s[h.kategori][pn]) s[h.kategori][pn] = {t:0,c:0};
-                    s[h.kategori][pn].t += n; s[h.kategori][pn].c++;
+                    let id = h.target_id;
+                    let nama = mPeg[id] || id;
+                    if(!s[h.kategori][id]) s[h.kategori][id] = {t:0, c:0, nama: nama};
+                    s[h.kategori][id].t += n; 
+                    s[h.kategori][id].c++;
                 } else if(['Penyelenggara','Sarpras','LMS'].includes(h.kategori)) {
-                    su[h.kategori].t += n; su[h.kategori].c++;
+                    su[h.kategori].t += n; 
+                    su[h.kategori].c++;
                 }
             });
-
-            const draw = (id, obj, c) => {
-                let lbls = Object.keys(obj), avgs = lbls.map(l => (obj[l].t/obj[l].c).toFixed(1));
+            Chart.defaults.backgroundColor = '#ffffff';
+            const draw = (id, obj, c, legId) => {
+                let lbls = Object.keys(obj);
+                let avgs = lbls.map(l => (obj[l].t/obj[l].c).toFixed(1));
                 let ctx = document.getElementById(id); if(!ctx) return;
                 if(window['ch_'+id]) window['ch_'+id].destroy();
-                window['ch_'+id] = new Chart(ctx, { type:'bar', data:{labels:lbls.length?lbls:['Data Kosong'], datasets:[{data:avgs.length?avgs:[0], backgroundColor:c, borderRadius:4}]}, options:{responsive:true, maintainAspectRatio:false, scales:{y:{max:100}}, plugins:{legend:{display:false}}} });
+                
+                window['ch_'+id] = new Chart(ctx, { 
+                    type:'bar', 
+                    data:{
+                        labels: lbls.length ? lbls : ['Data Kosong'], 
+                        datasets:[{data: avgs.length ? avgs : [0], backgroundColor: c, borderRadius: 4}]
+                    }, 
+                    options:{
+                        responsive: true, 
+                        maintainAspectRatio: false, 
+                        scales:{y:{max:100}}, 
+                        plugins:{legend:{display:false}}
+                    } 
+                });
+                let legEl = document.getElementById(legId);
+                if(legEl) {
+                    if (lbls.length > 0) {
+                        legEl.innerHTML = lbls.map(l => `<div class="text-[10px] text-gray-600 truncate mb-1 border-b border-gray-100 pb-1"><span class="font-bold text-gray-800">${l}</span>: ${obj[l].nama}</div>`).join('');
+                    } else {
+                        legEl.innerHTML = `<div class="text-[10px] text-gray-400 italic">Belum ada data</div>`;
+                    }
+                }
             };
-            draw('c-wid', s.Widyaiswara, '#6366f1'); draw('c-coa', s.Coach, '#0ea5e9'); draw('c-men', s.Mentor, '#14b8a6'); draw('c-pen', s.Penguji, '#f43f5e');
-
+            draw('c-wid', s.Widyaiswara, '#6366f1', 'leg-wid'); 
+            draw('c-coa', s.Coach, '#0ea5e9', 'leg-coa'); 
+            draw('c-men', s.Mentor, '#14b8a6', 'leg-men'); 
+            draw('c-pen', s.Penguji, '#f43f5e', 'leg-pen');
             let ctxU = document.getElementById('c-umu');
             if(ctxU) {
                 if(window.ch_u) window.ch_u.destroy();
@@ -1052,29 +1421,210 @@
                 window.ch_u = new Chart(ctxU, { type:'polarArea', data:{labels:lblsU, datasets:[{data:avgsU, backgroundColor:['#f59e0b','#10b981','#8b5cf6']}]}, options:{responsive:true, maintainAspectRatio:false, scales:{r:{max:100}}} });
             }
         }
-
-        // --- STREAMING_CHUNK: CRUD Modals & Saving Logic ---
+        window.exportAnalisisPDF = function() {
+            showToast('Mempersiapkan PDF Grafik...', 'info');
+            setTimeout(() => {
+                const doc = new window.jspdf.jsPDF('portrait', 'mm', 'a4');
+                doc.text("Laporan Visualisasi Analisis Data Evaluasi", 14, 15);
+                const addChart = (canvasId, x, y, w, h, title) => {
+                    const canvas = document.getElementById(canvasId);
+                    if(canvas) {
+                        doc.setFontSize(10); doc.setTextColor(50, 50, 50);
+                        doc.text(title, x, y - 2);
+                        const imgData = canvas.toDataURL('image/png');
+                        doc.addImage(imgData, 'PNG', x, y, w, h);
+                    }
+                };
+                addChart('c-wid', 15, 30, 85, 60, "Rata-rata Evaluasi Widyaiswara");
+                addChart('c-coa', 110, 30, 85, 60, "Rata-rata Evaluasi Coach");
+                addChart('c-men', 15, 105, 85, 60, "Rata-rata Evaluasi Mentor");
+                addChart('c-pen', 110, 105, 85, 60, "Rata-rata Evaluasi Penguji");
+                addChart('c-umu', 55, 180, 100, 100, "Rata-rata Fasilitas Umum (Panitia, Sarpras, LMS)");
+                doc.save(`Analisis_Grafik_${Date.now()}.pdf`);
+                showToast('Download Selesai', 'success');
+            }, 500);
+        };
+        window.renderMonitoringView = function(data, container) {
+            window.monitoringFilterPel = window.monitoringFilterPel || 'ALL';
+            let html = `
+                <div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800">Monitoring Progres Evaluasi</h2>
+                        <p class="text-xs text-gray-500 mt-1">Pantau peserta yang sudah atau belum mengisi kuesioner.</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2 items-center">
+                        <select id="flt-mon-pel" onchange="window.monitoringFilterPel=this.value; loadAdminMenu('monitoring');" class="border border-slate-300 bg-white px-3 py-2 rounded-xl text-sm shadow-sm">
+                            <option value="ALL">Semua Pelatihan</option>
+                            ${(data.pelatihan||[]).map(p=>`<option value="${p.id}" ${window.monitoringFilterPel===p.id?'selected':''}>${p.nama}</option>`).join('')}
+                        </select>
+                        <button onclick="exportMonitoring('excel')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-sm font-bold shadow transition-all flex items-center gap-2"><i class="fa-solid fa-file-excel"></i> Excel</button>
+                        <button onclick="exportMonitoring('pdf')" class="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-xl text-sm font-bold shadow transition-all flex items-center gap-2"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+                    </div>
+                </div>
+                <div class="bg-white rounded-2xl border border-gray-200 overflow-x-auto shadow-sm">
+                    <table class="w-full text-left text-sm whitespace-nowrap">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-500 text-[10px] uppercase border-b border-gray-200">
+                                <th class="p-4 font-bold">NIP</th>
+                                <th class="p-4 font-bold">Nama Peserta</th>
+                                <th class="p-4 font-bold">Pelatihan</th>
+                                <th class="p-4 font-bold text-center">Widyaiswara</th>
+                                <th class="p-4 font-bold text-center">Coach</th>
+                                <th class="p-4 font-bold text-center">Mentor</th>
+                                <th class="p-4 font-bold text-center">Penguji</th>
+                                <th class="p-4 font-bold text-center">Panitia</th>
+                                <th class="p-4 font-bold text-center">Sarpras</th>
+                                <th class="p-4 font-bold text-center">LMS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbl-monitoring-body" class="divide-y divide-gray-100">
+                            ${buildMonitoringRows(data)}
+                        </tbody>
+                    </table>
+                </div>`;
+            container.innerHTML = html;
+        };
+        function buildMonitoringRows(data) {
+            let fp = window.monitoringFilterPel;
+            let pList = (data.users||[]).filter(u => u.role === 'peserta' && (fp === 'ALL' || u.id_pelatihan === fp));
+            if (pList.length === 0) return `<tr><td colspan="10" class="p-8 text-center text-gray-400">Tidak ada peserta ditemukan.</td></tr>`;
+            let tp = {}; 
+            (data.pelatihan||[]).forEach(p => { tp[p.id] = { Widyaiswara:0, Coach:0, Penguji:0 }; });
+            (data.pengajar||[]).forEach(t => {
+                if (['Widyaiswara', 'Coach', 'Penguji'].includes(t.peran)) {
+                    if (t.id_pelatihan === 'SEMUA') { for(let pid in tp) tp[pid][t.peran]++; } 
+                    else if(tp[t.id_pelatihan]) { tp[t.id_pelatihan][t.peran]++; }
+                }
+            });
+            let subs = {}; 
+            (data.hasil||[]).forEach(h => {
+                if(!subs[h.nip]) subs[h.nip] = { Widyaiswara:new Set(), Coach:new Set(), Mentor:false, Penguji:new Set(), Penyelenggara:false, Sarpras:false, LMS:false };
+                if(['Widyaiswara','Coach','Penguji'].includes(h.kategori)) {
+                    subs[h.nip][h.kategori].add(h.target_id);
+                } else if(['Mentor', 'Penyelenggara','Sarpras','LMS'].includes(h.kategori)) {
+                    subs[h.nip][h.kategori] = true;
+                }
+            });
+            const renderBadge = (done, total, isNNA) => {
+                if(isNNA) return `<span class="bg-gray-200 text-gray-500 px-2 py-1 rounded text-[10px] font-bold">N/A</span>`;
+                if(total === 0) return `<span class="text-gray-400">-</span>`;
+                if(done >= total) return `<span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-[10px] font-bold"><i class="fa-solid fa-check mr-1"></i> ${done}/${total}</span>`;
+                if(done > 0) return `<span class="bg-amber-100 text-amber-700 px-2 py-1 rounded text-[10px] font-bold">${done}/${total}</span>`;
+                return `<span class="bg-rose-100 text-rose-700 px-2 py-1 rounded text-[10px] font-bold"><i class="fa-solid fa-xmark mr-1"></i> 0/${total}</span>`;
+            };
+            const renderBoolBadge = (isDone, isNNA) => {
+                if(isNNA) return `<span class="bg-gray-200 text-gray-500 px-2 py-1 rounded text-[10px] font-bold">N/A</span>`;
+                return isDone 
+                    ? `<span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-[10px] font-bold"><i class="fa-solid fa-check mr-1"></i> Sudah</span>` 
+                    : `<span class="bg-rose-100 text-rose-700 px-2 py-1 rounded text-[10px] font-bold"><i class="fa-solid fa-xmark mr-1"></i> Belum</span>`;
+            };
+            return pList.map(p => {
+                let p_tp = tp[p.id_pelatihan] || { Widyaiswara:0, Coach:0, Penguji:0 };
+                let s = subs[p.nip] || { Widyaiswara:new Set(), Coach:new Set(), Mentor:false, Penguji:new Set(), Penyelenggara:false, Sarpras:false, LMS:false };
+                let pelData = (data.pelatihan||[]).find(x => x.id === p.id_pelatihan) || {};
+                let activeEval = pelData.evaluasi_aktif || ['Widyaiswara','Coach','Mentor','Penguji','Penyelenggara','Sarpras','LMS'];
+                return `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="p-4 text-xs font-medium text-slate-600">${p.nip}</td>
+                        <td class="p-4 text-sm font-bold text-slate-800">${p.nama}</td>
+                        <td class="p-4"><span class="bg-blue-50 border border-blue-100 text-blue-700 px-2 py-1 rounded-md text-[10px] font-bold">${p.id_pelatihan}</span></td>
+                        <td class="p-4 text-center">${renderBadge(s.Widyaiswara.size, p_tp.Widyaiswara, !activeEval.includes('Widyaiswara'))}</td>
+                        <td class="p-4 text-center">${renderBadge(s.Coach.size, p_tp.Coach, !activeEval.includes('Coach'))}</td>
+                        <td class="p-4 text-center">${renderBoolBadge(s.Mentor, !activeEval.includes('Mentor'))}</td>
+                        <td class="p-4 text-center">${renderBadge(s.Penguji.size, p_tp.Penguji, !activeEval.includes('Penguji'))}</td>
+                        <td class="p-4 text-center">${renderBoolBadge(s.Penyelenggara, !activeEval.includes('Penyelenggara'))}</td>
+                        <td class="p-4 text-center">${renderBoolBadge(s.Sarpras, !activeEval.includes('Sarpras'))}</td>
+                        <td class="p-4 text-center">${renderBoolBadge(s.LMS, !activeEval.includes('LMS'))}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        window.exportMonitoring = function(fmt) {
+            let data = currentAdminData;
+            let fp = window.monitoringFilterPel;
+            let pList = (data.users||[]).filter(u => u.role === 'peserta' && (fp === 'ALL' || u.id_pelatihan === fp));
+            if(pList.length === 0) return showToast('Tidak ada data peserta.', 'error');
+            let tp = {}; 
+            (data.pelatihan||[]).forEach(p => { tp[p.id] = { Widyaiswara:0, Coach:0, Penguji:0 }; });
+            (data.pengajar||[]).forEach(t => {
+                if (['Widyaiswara', 'Coach', 'Penguji'].includes(t.peran)) {
+                    if (t.id_pelatihan === 'SEMUA') { for(let pid in tp) tp[pid][t.peran]++; } 
+                    else if(tp[t.id_pelatihan]) { tp[t.id_pelatihan][t.peran]++; }
+                }
+            });
+            let subs = {}; 
+            (data.hasil||[]).forEach(h => {
+                if(!subs[h.nip]) subs[h.nip] = { Widyaiswara:new Set(), Coach:new Set(), Mentor:false, Penguji:new Set(), Penyelenggara:false, Sarpras:false, LMS:false };
+                if(['Widyaiswara','Coach','Penguji'].includes(h.kategori)) { subs[h.nip][h.kategori].add(h.target_id); } 
+                else if(['Mentor', 'Penyelenggara','Sarpras','LMS'].includes(h.kategori)) { subs[h.nip][h.kategori] = true; }
+            });
+            let headers = ['NIP', 'Nama Peserta', 'Pelatihan', 'Widyaiswara', 'Coach', 'Mentor', 'Penguji', 'Panitia', 'Sarpras', 'LMS'];
+            let exportData = pList.map(p => {
+                let p_tp = tp[p.id_pelatihan] || { Widyaiswara:0, Coach:0, Penguji:0 };
+                let s = subs[p.nip] || { Widyaiswara:new Set(), Coach:new Set(), Mentor:false, Penguji:new Set(), Penyelenggara:false, Sarpras:false, LMS:false };
+                let pelData = (data.pelatihan||[]).find(x => x.id === p.id_pelatihan) || {};
+                let activeEval = pelData.evaluasi_aktif || ['Widyaiswara','Coach','Mentor','Penguji','Penyelenggara','Sarpras','LMS'];
+                
+                const fmtBadge = (done, total, isNNA) => isNNA ? "N/A" : (total === 0 ? "-" : `${done}/${total}`);
+                const fmtBool = (isDone, isNNA) => isNNA ? "N/A" : (isDone ? "Sudah" : "Belum");
+                return [
+                    p.nip, p.nama, p.id_pelatihan,
+                    fmtBadge(s.Widyaiswara.size, p_tp.Widyaiswara, !activeEval.includes('Widyaiswara')),
+                    fmtBadge(s.Coach.size, p_tp.Coach, !activeEval.includes('Coach')),
+                    fmtBool(s.Mentor, !activeEval.includes('Mentor')),
+                    fmtBadge(s.Penguji.size, p_tp.Penguji, !activeEval.includes('Penguji')),
+                    fmtBool(s.Penyelenggara, !activeEval.includes('Penyelenggara')),
+                    fmtBool(s.Sarpras, !activeEval.includes('Sarpras')),
+                    fmtBool(s.LMS, !activeEval.includes('LMS'))
+                ];
+            });
+            if(fmt === 'excel') {
+                let wb = XLSX.utils.book_new(); exportData.unshift(headers);
+                XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(exportData), "Monitoring");
+                XLSX.writeFile(wb, `Monitoring_Evaluasi_${Date.now()}.xlsx`);
+                showToast('Download Excel Berhasil', 'success');
+            } else {
+                const doc = new window.jspdf.jsPDF('landscape');
+                doc.text("Laporan Progres Monitoring Evaluasi", 14, 15); doc.setFontSize(9);
+                doc.autoTable({ head: [headers], body: exportData, startY: 20, styles: { fontSize: 8, halign: 'center' }, columnStyles: { 0: { halign: 'left' }, 1: { halign: 'left' } } });
+                doc.save(`Monitoring_Evaluasi_${Date.now()}.pdf`);
+                showToast('Download PDF Berhasil', 'success');
+            }
+        };
         function openModal(type, action, id=null) {
             document.getElementById('crud-modal').classList.remove('hidden');
             let body = document.getElementById('modal-body'), pel = currentAdminData.pelatihan||[], mst = currentAdminData.master_pegawai||[];
-            let dList = type==='pelatihan'?currentAdminData.pelatihan:(type==='peserta'?currentAdminData.users:(type==='kuesioner'?currentAdminData.kuesioner:(type==='master_pegawai'?mst:currentAdminData.pengajar)));
+            let dList = type==='pelatihan'?currentAdminData.pelatihan:(type==='peserta'?currentAdminData.users:(type==='kuesioner'?currentAdminData.kuesioner:(type==='master_pegawai'?mst:(type==='kategori_evaluasi'?currentAdminData.kategori_evaluasi:currentAdminData.pengajar))));
             let item = (action==='edit' && id) ? dList.find(x=>(x.doc_id===id||x.id===id||x.nip===id)) || {} : {};
-
             let html = `<form id="crud-form" class="space-y-4"><input type="hidden" name="action" value="${action}">`;
             if (action==='edit') html += `<input type="hidden" name="old_doc_id" value="${id}">`;
-
             if (type === 'master_pegawai') {
                 document.getElementById('modal-title').innerText = 'Master Pegawai';
                 html += `<div><label class="text-xs font-bold block mb-1">ID (NIP)</label><input type="text" name="id" value="${item.id||''}" ${action==='edit'?'readonly':''} required class="w-full border p-2 rounded-lg text-sm bg-gray-50"></div>
                     <div><label class="text-xs font-bold block mb-1">Nama</label><input type="text" name="nama" value="${item.nama||''}" required class="w-full border p-2 rounded-lg text-sm"></div>
                     <div><label class="text-xs font-bold block mb-1">Jabatan</label><input type="text" name="jabatan" value="${item.jabatan||''}" class="w-full border p-2 rounded-lg text-sm"></div>`;
+            } else if (type === 'kategori_evaluasi') {
+                document.getElementById('modal-title').innerText = 'Master Kategori Evaluasi';
+                html += `<div><label class="text-xs font-bold block mb-1 text-slate-700">Kode Kategori (Tanpa Spasi)</label><input type="text" name="id" value="${item.id||''}" ${action==='edit'?'readonly':''} required pattern="[a-zA-Z0-9_]+" placeholder="Contoh: Konsumsi" class="w-full border p-2 rounded-lg text-sm bg-gray-50"></div>
+                    <div><label class="text-xs font-bold block mb-1 text-slate-700">Nama Kategori</label><input type="text" name="nama" value="${item.nama||''}" required placeholder="Contoh: Konsumsi & Snack" class="w-full border p-2 rounded-lg text-sm"></div>
+                    <div><label class="text-xs font-bold block mb-1 text-slate-700">Tipe Penilaian</label><select name="tipe" id="kategori-tipe" required onchange="window.updateSubjekOptions()" class="w-full border p-2 rounded-lg text-sm"><option value="SDM" ${item.tipe==='SDM'?'selected':''}>SDM / Pengajar (Target Individu)</option><option value="Fasilitas" ${item.tipe==='Fasilitas'?'selected':''}>Fasilitas / Kepanitiaan (Target Umum)</option></select></div>
+                    <div><label class="text-xs font-bold block mb-1 text-slate-700">Subjek Penilaian (Pemetaan Sistem)</label><select name="subjek" id="kategori-subjek" required class="w-full border p-2 rounded-lg text-sm"></select></div>
+                    <div><label class="text-xs font-bold block mb-1 text-slate-700">Icon (FontAwesome)</label><input type="text" name="icon" value="${item.icon||'fa-solid fa-list-check'}" placeholder="fa-solid fa-list-check" class="w-full border p-2 rounded-lg text-sm text-gray-600"></div>`;
             } else if (type === 'pelatihan') {
                 document.getElementById('modal-title').innerText = 'Jenis Pelatihan';
+                let kats = currentAdminData.kategori_evaluasi || [];
+                let activeEval = item.evaluasi_aktif || kats.map(k => k.id);
+                let checksHTML = kats.map(k => `<label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" name="evaluasi_aktif" value="${k.id}" ${activeEval.includes(k.id)?'checked':''} class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500">${k.nama}</label>`).join('');
+                
                 html += `<div><label class="text-xs font-bold block mb-1">Kode</label><input type="text" name="id" value="${item.id||''}" ${action==='edit'?'readonly':''} required class="w-full border p-2 rounded-lg text-sm bg-gray-50"></div>
                     <div><label class="text-xs font-bold block mb-1">Nama Pelatihan</label><input type="text" name="nama" value="${item.nama||''}" required class="w-full border p-2 rounded-lg text-sm"></div>
                     <div class="flex gap-2">
                         <div class="w-1/2"><label class="text-xs font-bold block mb-1">Tgl Mulai</label><input type="date" name="tgl_mulai" value="${item.tgl_mulai||''}" required class="w-full border p-2 rounded-lg text-sm"></div>
                         <div class="w-1/2"><label class="text-xs font-bold block mb-1">Tgl Selesai</label><input type="date" name="tgl_selesai" value="${item.tgl_selesai||''}" required class="w-full border p-2 rounded-lg text-sm"></div>
+                    </div>
+                    <div class="col-span-full pt-2 border-t mt-2">
+                        <label class="text-xs font-bold block mb-2 text-gray-700">Modul Evaluasi Aktif</label>
+                        <div class="grid grid-cols-2 gap-2 bg-gray-50 p-3 rounded-lg border border-gray-200">${checksHTML}</div>
                     </div>`;
             } else if (type === 'peserta') {
                 document.getElementById('modal-title').innerText = 'Peserta';
@@ -1084,27 +1634,98 @@
             } else if (['widyaiswara','coach','mentor','penguji'].includes(type)) {
                 let role = type.charAt(0).toUpperCase() + type.slice(1);
                 document.getElementById('modal-title').innerText = `Tugas ${role}`;
+                window.tempMasterPegawai = mst; // Simpan sementara untuk fitur pencarian
                 html += `<input type="hidden" name="peran" value="${role}">
-                    <div><label class="text-xs font-bold block mb-1">Pilih dari Master</label><select name="id" required onchange="document.getElementById('m-nama').value=this.options[this.selectedIndex].dataset.nama||''" class="w-full border p-2 rounded-lg text-sm" ${action==='edit'?'disabled':''}><option value="">-- Master Pegawai --</option>${mst.map(m=>`<option value="${m.id}" data-nama="${m.nama}" ${item.id===m.id?'selected':''}>${m.nama}</option>`).join('')}</select>${action==='edit'?`<input type="hidden" name="id" value="${item.id}">`:''}</div>
+                    <div>
+                        <label class="text-xs font-bold block mb-1">Pilih dari Master</label>
+                        ${action !== 'edit' ? `
+                        <div class="relative mb-2">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><i class="fa-solid fa-magnifying-glass text-xs"></i></span>
+                            <input type="text" id="search-pegawai" placeholder="Ketik Nama / NIP untuk mencari..." class="w-full pl-8 pr-3 py-2 border rounded-lg text-sm bg-blue-50/50 focus:outline-none focus:ring-2 focus:ring-blue-500" onkeyup="window.filterPegawai()">
+                        </div>` : ''}
+                        <select name="id" id="select-pegawai" required onchange="document.getElementById('m-nama').value=this.options[this.selectedIndex]?.dataset?.nama||''" class="w-full border p-2 rounded-lg text-sm bg-white" ${action==='edit'?'disabled':''}>
+                            <option value="">-- Master Pegawai --</option>
+                            ${mst.map(m=>`<option value="${m.id}" data-nama="${m.nama}" ${item.id===m.id?'selected':''}>${m.nama} (${m.id})</option>`).join('')}
+                        </select>
+                        ${action==='edit'?`<input type="hidden" name="id" value="${item.id}">`:''}
+                    </div>
                     <div><label class="text-xs font-bold block mb-1">Nama (Otomatis)</label><input type="text" name="nama" id="m-nama" value="${item.nama||''}" readonly class="w-full border p-2 rounded-lg text-sm bg-gray-100"></div>
                     <div><label class="text-xs font-bold block mb-1">Tugaskan ke Pelatihan</label><select name="id_pelatihan" required class="w-full border p-2 rounded-lg text-sm"><option value="SEMUA" ${item.id_pelatihan==='SEMUA'?'selected':''}>Semua Pelatihan</option>${pel.map(p=>`<option value="${p.id}" ${item.id_pelatihan===p.id?'selected':''}>${p.nama}</option>`).join('')}</select></div>`;
             } else if (type === 'kuesioner') {
                 document.getElementById('modal-title').innerText = 'Soal Kuesioner';
+                let kats = currentAdminData.kategori_evaluasi || [];
                 html += `<input type="hidden" name="id" value="${item.id||''}">
-                    <div><label class="text-xs font-bold block mb-1">Kategori</label><select name="kategori" required class="w-full border p-2 rounded-lg text-sm">${['Widyaiswara','Coach','Mentor','Penguji','Penyelenggara','Sarpras','LMS'].map(k=>`<option value="${k}" ${item.kategori===k?'selected':''}>${k}</option>`).join('')}</select></div>
+                    <div><label class="text-xs font-bold block mb-1">Kategori</label><select name="kategori" required class="w-full border p-2 rounded-lg text-sm">${kats.map(k=>`<option value="${k.id}" ${item.kategori===k.id?'selected':''}>${k.nama}</option>`).join('')}</select></div>
                     <div><label class="text-xs font-bold block mb-1">Pelatihan</label><select name="id_pelatihan" required class="w-full border p-2 rounded-lg text-sm"><option value="SEMUA" ${item.id_pelatihan==='SEMUA'?'selected':''}>Semua Pelatihan</option>${pel.map(p=>`<option value="${p.id}" ${item.id_pelatihan===p.id?'selected':''}>${p.nama}</option>`).join('')}</select></div>
                     <div><label class="text-xs font-bold block mb-1">Tipe</label><select name="tipe" required class="w-full border p-2 rounded-lg text-sm"><option value="likert" ${item.tipe==='likert'?'selected':''}>Likert (1-5)</option><option value="100" ${item.tipe==='100'?'selected':''}>Angka (0-100)</option><option value="text" ${item.tipe==='text'?'selected':''}>Teks (Uraian)</option></select></div>
                     <div><label class="text-xs font-bold block mb-1">Pertanyaan</label><textarea name="pertanyaan" required rows="3" class="w-full border p-2 rounded-lg text-sm">${item.pertanyaan||''}</textarea></div>`;
             }
             body.innerHTML = html + `</form>`;
+            
+            if (type === 'kategori_evaluasi') {
+                window.updateSubjekOptions(item.subjek || '');
+            }
+            
             document.getElementById('modal-save-btn').onclick = () => saveCrudData(type);
         }
-
         function closeModal() { document.getElementById('crud-modal').classList.add('hidden'); }
+        
+        window.updateSubjekOptions = function(selectedValue = '') {
+            const tipeSelect = document.getElementById('kategori-tipe');
+            const subjekSelect = document.getElementById('kategori-subjek');
+            if (!tipeSelect || !subjekSelect) return;
+            
+            const tipe = tipeSelect.value;
+            let options = [];
+            
+            if (tipe === 'SDM') {
+                options = ['Widyaiswara', 'Coach', 'Mentor', 'Penguji', 'Lainnya'];
+            } else {
+                options = ['Penyelenggara', 'Sarpras', 'LMS', 'Lainnya'];
+            }
+            
+            let html = '';
+            options.forEach(opt => {
+                let isSelected = selectedValue === opt ? 'selected' : '';
+                html += `<option value="${opt}" ${isSelected}>${opt}</option>`;
+            });
+            subjekSelect.innerHTML = html;
+        };
+
+        // --- Fungsi Filter Pencarian Pegawai di Modal ---
+        window.filterPegawai = function() {
+            let filterText = document.getElementById('search-pegawai').value.toLowerCase();
+            let select = document.getElementById('select-pegawai');
+            if (!select || !window.tempMasterPegawai) return;
+            
+            let currentValue = select.value;
+            let html = '<option value="">-- Master Pegawai --</option>';
+            
+            window.tempMasterPegawai.forEach(m => {
+                let text = `${m.nama} (${m.id})`; // Bisa mencari dari Nama atau NIP
+                if (text.toLowerCase().indexOf(filterText) > -1) {
+                    let isSelected = (m.id === currentValue) ? 'selected' : '';
+                    html += `<option value="${m.id}" data-nama="${m.nama}" ${isSelected}>${text}</option>`;
+                }
+            });
+            select.innerHTML = html;
+        };
 
         async function saveCrudData(type) {
             const form = document.getElementById('crud-form'); if (!form.checkValidity()) return form.reportValidity();
-            const payload = Object.fromEntries(new FormData(form).entries());
+            
+            // Handle form data including multiple checkboxes correctly
+            const payload = {};
+            for (let [k, v] of new FormData(form).entries()) {
+                if (k === 'evaluasi_aktif') {
+                    if (!payload[k]) payload[k] = [];
+                    payload[k].push(v);
+                } else {
+                    payload[k] = v;
+                }
+            }
+            if (type === 'pelatihan' && !payload.evaluasi_aktif) payload.evaluasi_aktif = []; // If none checked
+            
             let act = payload.action, oId = payload.old_doc_id; delete payload.action; delete payload.old_doc_id;
             
             let cName = (['widyaiswara','coach','mentor','penguji'].includes(type)) ? 'pengajar' : (type==='peserta'?'users':type);
@@ -1113,7 +1734,6 @@
             if(cName==='pengajar' && !oId) { dId = `${payload.id}_${payload.peran}_${payload.id_pelatihan}`.replace(/[^a-zA-Z0-9_]/g, ''); }
             if(type==='kuesioner' && !dId) { dId = 'Q'+Date.now(); payload.id=dId; }
             payload.doc_id = dId;
-
             showLoader('Menyimpan...'); closeModal();
             try {
                 if(window.IS_PREVIEW) {
@@ -1128,7 +1748,6 @@
                 } loadAdminMenu(type);
             } catch(e) { showToast(e.message, 'error'); } finally { hideLoader(); }
         }
-
         async function deleteData(type, id) {
             showLoader('Menghapus...');
             let cName = (['widyaiswara','coach','mentor','penguji'].includes(type)) ? 'pengajar' : (type==='peserta'?'users':type);
@@ -1148,6 +1767,100 @@
                 } loadAdminMenu(type);
             } catch(e) { showToast(e.message, 'error'); } finally { hideLoader(); }
         }
+        
+        // --- STREAMING_CHUNK: Fitur Hapus Peserta Bulk ---
+        window.confirmDeleteAllPeserta = function(idPelatihan) {
+            let msg = idPelatihan === 'ALL' 
+                ? "Apakah Anda yakin ingin menghapus <b class='text-rose-600'>SEMUA PESERTA</b> secara permanen? Tindakan ini tidak dapat dibatalkan." 
+                : `Apakah Anda yakin ingin menghapus semua peserta pada pelatihan <b class='text-rose-600'>${idPelatihan}</b>?`;
+            
+            document.getElementById('confirm-msg').innerHTML = msg;
+            document.getElementById('confirm-modal').classList.remove('hidden');
+            document.getElementById('confirm-yes-btn').onclick = () => window.executeDeleteAllPeserta(idPelatihan);
+        };
+
+        window.closeConfirmModal = function() {
+            document.getElementById('confirm-modal').classList.add('hidden');
+        };
+
+        window.executeDeleteAllPeserta = async function(idPelatihan) {
+            window.closeConfirmModal();
+            showLoader('Menghapus data peserta...');
+            try {
+                if(window.IS_PREVIEW) {
+                    await new Promise(r=>setTimeout(r,500));
+                    let initialLength = dbDummy.users.length;
+                    dbDummy.users = dbDummy.users.filter(u => !(u.role === 'peserta' && (idPelatihan === 'ALL' || u.id_pelatihan === idPelatihan)));
+                    let deletedCount = initialLength - dbDummy.users.length;
+                    showToast(`${deletedCount} Peserta dihapus (Preview)`, 'success');
+                } else {
+                    let q = idPelatihan === 'ALL' 
+                        ? window.fbQuery(window.fbCollection(window.db, "users"), window.fbWhere("role", "==", "peserta"))
+                        : window.fbQuery(window.fbCollection(window.db, "users"), window.fbWhere("role", "==", "peserta"), window.fbWhere("id_pelatihan", "==", idPelatihan));
+                    
+                    const snap = await window.fbGetDocs(q);
+                    let count = snap.size;
+                    if (count > 0) {
+                        const batch = window.fbWriteBatch(window.db);
+                        snap.forEach(doc => { batch.delete(doc.ref); });
+                        await batch.commit();
+                        showToast(`${count} Peserta berhasil dihapus`, 'success');
+                    } else {
+                        showToast('Tidak ada data peserta untuk dihapus', 'info');
+                    }
+                }
+                loadAdminMenu('peserta');
+            } catch(e) { 
+                showToast(e.message, 'error'); 
+            } finally { 
+                hideLoader(); 
+            }
+        };
+
+        // --- STREAMING_CHUNK: Fitur Hapus Pengajar Bulk ---
+        window.confirmDeleteAllPengajar = function(type, peran, idPelatihan) {
+            let msg = idPelatihan === 'ALL' 
+                ? `Apakah Anda yakin ingin menghapus <b class='text-rose-600'>SEMUA ${peran}</b> secara permanen? Tindakan ini tidak dapat dibatalkan.` 
+                : `Apakah Anda yakin ingin menghapus semua ${peran} pada pelatihan <b class='text-rose-600'>${idPelatihan}</b>?`;
+            
+            document.getElementById('confirm-msg').innerHTML = msg;
+            document.getElementById('confirm-modal').classList.remove('hidden');
+            document.getElementById('confirm-yes-btn').onclick = () => window.executeDeleteAllPengajar(type, peran, idPelatihan);
+        };
+
+        window.executeDeleteAllPengajar = async function(type, peran, idPelatihan) {
+            window.closeConfirmModal();
+            showLoader(`Menghapus data ${peran}...`);
+            try {
+                if(window.IS_PREVIEW) {
+                    await new Promise(r=>setTimeout(r,500));
+                    let initialLength = dbDummy.pengajar.length;
+                    dbDummy.pengajar = dbDummy.pengajar.filter(p => !(p.peran === peran && (idPelatihan === 'ALL' || p.id_pelatihan === idPelatihan)));
+                    let deletedCount = initialLength - dbDummy.pengajar.length;
+                    showToast(`${deletedCount} ${peran} dihapus (Preview)`, 'success');
+                } else {
+                    let q = idPelatihan === 'ALL' 
+                        ? window.fbQuery(window.fbCollection(window.db, "pengajar"), window.fbWhere("peran", "==", peran))
+                        : window.fbQuery(window.fbCollection(window.db, "pengajar"), window.fbWhere("peran", "==", peran), window.fbWhere("id_pelatihan", "==", idPelatihan));
+                    
+                    const snap = await window.fbGetDocs(q);
+                    let count = snap.size;
+                    if (count > 0) {
+                        const batch = window.fbWriteBatch(window.db);
+                        snap.forEach(doc => { batch.delete(doc.ref); });
+                        await batch.commit();
+                        showToast(`${count} ${peran} berhasil dihapus`, 'success');
+                    } else {
+                        showToast(`Tidak ada data ${peran} untuk dihapus`, 'info');
+                    }
+                }
+                loadAdminMenu(type);
+            } catch(e) { 
+                showToast(e.message, 'error'); 
+            } finally { 
+                hideLoader(); 
+            }
+        };
     </script>
 </body>
 </html>
